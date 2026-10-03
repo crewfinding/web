@@ -24,9 +24,15 @@ const deviceStorage = {
   },
 }
 
+// Live updates (config changes, pushed) come from a long-running host, since
+// Vercel cuts long responses — the same host the mobile app streams from.
+// Unset (local dev): the stream is served by the API itself.
+const STREAM_BASE_URL = import.meta.env.VITE_STREAM_API_URL as string | undefined
+
 // Single client for the whole app; hooks reach it via <FonderieProvider>.
 export const fonderie = new FonderieClient({
   baseUrl: API_BASE_URL,
+  ...(STREAM_BASE_URL ? { sse: { baseUrl: STREAM_BASE_URL } } : {}),
   // What the office screens fetched, kept in this browser: a reload or a new
   // visit opens on the last data, refreshed behind what is shown. Tied to the
   // signed-in user and wiped on sign-out by the client. The same choice as the
