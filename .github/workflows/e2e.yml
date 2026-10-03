@@ -85,14 +85,15 @@ jobs:
         uses: actions/checkout@v4
 
       # The app e2e drives a real backend: the CrewFinding API, a private repo —
-      # read with a fine-grained token (contents: read on crewfinding/api).
+      # read with a read-only deploy key on crewfinding/api (its private half is
+      # this repo's API_DEPLOY_KEY secret). Repo-scoped, no expiry, no person.
       - name: Checkout API
         uses: actions/checkout@v4
         with:
           repository: crewfinding/api
           ref: main
           path: _api
-          token: ${{ secrets.API_READ_TOKEN }}
+          ssh-key: ${{ secrets.API_DEPLOY_KEY }}
 
       - uses: actions/setup-node@v4
         with:
