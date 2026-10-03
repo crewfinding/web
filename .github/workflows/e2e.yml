@@ -1,0 +1,136 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-typecheck:
+    name: Lint & typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run check:brand
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  app-e2e:
+    name: App e2e (auth UI)
+    # Pinned to 22.04: Playwright 1.40.0's `install --with-deps` predates Ubuntu
+    # 24.04's libasound2 -> libasound2t64 rename and fails on ubuntu-latest.
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: crewfinding
+          POSTGRES_PASSWORD: crewfinding
+          POSTGRES_DB: crewfinding_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crewfinding -d crewfinding_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # --- the CrewFinding API the app talks to ---
+      DATABASE_URL: postgresql://crewfinding:crewfinding@localhost:5432/crewfinding_e2e
+      JWT_SECRET: ci-e2e-jwt-secret-please-change-in-prod-0001
+      PORT: '4000'
+      VITE_API_URL: http://localhost:4000/v1
+      FRONTEND_URL: http://localhost:5173
+      # --- test inbox (Ethereal) from repo secrets; unset => email specs skip ---
+      # The same login is used to send (API SMTP) and to read (test IMAP).
+      SMTP_HOST: ${{ secrets.E2E_MAIL_USER != '' && 'smtp.ethereal.email' || '' }}
+      SMTP_PORT: '587'
+      SMTP_SECURE: 'false'
+      SMTP_USER: ${{ secrets.E2E_MAIL_USER }}
+      SMTP_PASS: ${{ secrets.E2E_MAIL_PASS }}
+      SMTP_FROM: ${{ secrets.E2E_MAIL_USER }}
+      E2E_IMAP_HOST: imap.ethereal.email
+      E2E_IMAP_PORT: '993'
+      E2E_IMAP_USER: ${{ secrets.E2E_MAIL_USER }}
+      E2E_IMAP_PASS: ${{ secrets.E2E_MAIL_PASS }}
+
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+
+      # The app e2e drives a real backend: the CrewFinding API, a private repo —
+      # read with a fine-grained token (contents: read on crewfinding/api).
+      - name: Checkout API
+        uses: actions/checkout@v4
+        with:
+          repository: crewfinding/api
+          ref: main
+          path: _api
+          token: ${{ secrets.API_READ_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            _api/package-lock.json
+
+      - name: Install API deps
+        working-directory: _api
+        run: npm ci
+
+      - name: Install app deps
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Migrate, start API, wait for health, run app e2e
+        run: |
+          ( cd _api && npm run migrate:ci )
+          ( cd _api && npm start > "$GITHUB_WORKSPACE/api.log" 2>&1 & )
+          for i in $(seq 1 60); do curl -sf http://localhost:4000/v1/health && break; sleep 2; done
+          curl -sf http://localhost:4000/v1/health || { echo "API failed to start"; cat api.log; exit 1; }
+          # Playwright starts the app dev server (webServer) itself, reading VITE_API_URL.
+          npm run test:e2e
+
+      - name: API log on failure
+        if: failure()
+        run: cat api.log || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: app-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

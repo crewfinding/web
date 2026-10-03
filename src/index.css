@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+
+/*
+ * Linear design tokens. Light values are the :root base; .dark overrides below.
+ * Light hierarchy comes from white surfaces + hairline borders + faint shadows;
+ * dark hierarchy comes from the surface ladder + borders (shadow token collapses).
+ */
+@theme {
+  --font-sans: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+
+  /* Dialog motion: overlay fades, panel settles in with a slight rise, and
+     result icons pop with a small overshoot. Keyframes define only `from` —
+     the resting state comes from each element's own utilities, so the
+     animation can never fight the layout (the panel keeps translateY(-50%)). */
+  --animate-overlay-in: overlay-in 150ms ease-out;
+  --animate-dialog-in: dialog-in 220ms cubic-bezier(0.22, 1.1, 0.36, 1);
+  /* SVG stroke draw-on (StatusIcon): each element sets --draw-length to its
+     own path length; `both` keeps it hidden through its delay. The resting
+     stroke-dashoffset is 0, so motion-reduce:animate-none shows the icon
+     fully drawn instead of hiding it. */
+  --animate-draw: draw 400ms ease-out both;
+
+  @keyframes overlay-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(calc(-50% + 12px)) scale(0.96);
+    }
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: var(--draw-length, 100);
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+
+  --text-card-title: 22px;
+  --text-card-title--line-height: 1.25;
+  --text-card-title--letter-spacing: -0.4px;
+  --text-card-title--font-weight: 500;
+  --text-headline: 28px;
+  --text-headline--line-height: 1.2;
+  --text-headline--letter-spacing: -0.6px;
+  --text-headline--font-weight: 600;
+  --text-eyebrow: 13px;
+  --text-eyebrow--line-height: 1.3;
+  --text-eyebrow--letter-spacing: 0.4px;
+  --text-eyebrow--font-weight: 500;
+
+  --color-canvas: #f6f8fa;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f5f6f6;
+  --color-surface-3: #ececee;
+  --color-sidebar: #ffffff;
+  --color-hairline: #e3e4e8;
+  --color-hairline-strong: #d5d7db;
+  --color-ink: #08090a;
+  --color-ink-muted: #4a505a;
+  --color-ink-subtle: #6b707a;
+  --color-ink-tertiary: #878c94; /* disabled text only — below AA by design */
+  /* CrewFinding blue, deepened from the mobile brand #007BFF so white button
+     text and link text pass WCAG AA (#007BFF on white is ~4.0:1; this ~5.9:1). */
+  --color-primary: #0062cc;
+  --color-on-primary: #ffffff;
+  --color-primary-hover: #0050a8;
+  --color-primary-focus: #0062cc;
+  --color-link: #0062cc; /* same as primary: passes AA as text on white and surface tints */
+  --color-success: #136e2b; /* darker: passes AA as 12px text on bg-success/10 over surface-2 */
+  --color-warning: #b45309;
+  --color-error: #b91c1c; /* deep enough to pass AA on error-tinted surfaces */
+  --color-chart-1: #0062cc;
+  --color-chart-1-fill: rgb(11 111 86 / 0.12);
+  --color-chart-2: #7aaea1;
+  --color-chart-2-fill: rgb(122 174 161 / 0.12);
+  --color-chart-grid: var(--color-hairline);
+  --color-overlay: #000000;
+
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+.dark {
+  --color-canvas: #010102;
+  --color-surface-1: #0f1011;
+  --color-surface-2: #141516;
+  --color-surface-3: #18191a;
+  --color-sidebar: #0f1011;
+  --color-hairline: #23252a;
+  --color-hairline-strong: #34343a;
+  --color-ink: #f7f8f8;
+  --color-ink-muted: #d0d6e0;
+  --color-ink-subtle: #8a8f98;
+  --color-ink-tertiary: #62666d;
+  --color-primary-hover: #4da3ff;
+  --color-link: #4da3ff;
+  --color-success: #27a644;
+  --color-warning: #d97706;
+  --color-error: #ef4444;
+  --color-chart-1-fill: rgb(11 111 86 / 0.35);
+  --color-chart-2-fill: rgb(122 174 161 / 0.35);
+  --shadow-card: 0 0 #0000;
+}
+
+:root {
+  color-scheme: light dark;
+}
+:root.light {
+  color-scheme: light;
+}
+:root.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply overflow-x-hidden bg-canvas font-sans text-sm leading-[1.5] text-ink-muted;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-hairline bg-surface-1 shadow-card;
+  }
+  .input {
+    @apply w-full rounded-md border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-subtle focus:border-hairline-strong focus:ring-2 focus:ring-primary-focus/50;
+  }
+}

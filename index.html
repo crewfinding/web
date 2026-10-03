@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>CrewFinding</title>
+    <script>
+      // Apply the theme class before first paint to avoid a flash of the wrong theme.
+      // The stored value may be JSON ("dark") or a legacy raw string (dark).
+      try {
+        const stored = (localStorage.getItem('theme') || '').replace(/"/g, '')
+        const dark = stored ? stored === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches
+        document.documentElement.classList.add(dark ? 'dark' : 'light')
+      } catch {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
