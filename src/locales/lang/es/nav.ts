@@ -28,6 +28,7 @@ const nav: typeof enNav = {
     links: {
       dashboard: 'Panel de control',
       billing: 'Facturación',
+      customers: 'Clientes',
       organization: 'Organización',
       settings: 'Configuración',
     },

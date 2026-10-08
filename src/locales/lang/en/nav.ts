@@ -26,6 +26,7 @@ const nav = {
     links: {
       dashboard: 'Dashboard',
       billing: 'Billing',
+      customers: 'Customers',
       organization: 'Organization',
       settings: 'Settings',
     },

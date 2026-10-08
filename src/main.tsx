@@ -52,6 +52,10 @@ const Activity = lazy(() => import('./pages/organization/Activity'))
 const Roles = lazy(() => import('./pages/organization/Roles'))
 const RoleDetail = lazy(() => import('./pages/organization/RoleDetail'))
 const CreateRole = lazy(() => import('./pages/organization/CreateRole'))
+// Customers (docs/parity/5-customers.md): list + undo bin, create, detail
+const Customers = lazy(() => import('./pages/customers/Customers'))
+const CustomerNew = lazy(() => import('./pages/customers/CustomerNew'))
+const CustomerDetail = lazy(() => import('./pages/customers/CustomerDetail'))
 
 function AppToaster() {
   const { theme } = useTheme()
@@ -84,6 +88,9 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/billing" element={<Billing />} />
                 <Route path="/billing/success" element={<CheckoutRedirect status="success" />} />
                 <Route path="/billing/cancelled" element={<CheckoutRedirect status="cancelled" />} />
+                <Route path="/customers" element={<Suspense fallback={null}><Customers /></Suspense>} />
+                <Route path="/customers/new" element={<Suspense fallback={null}><CustomerNew /></Suspense>} />
+                <Route path="/customers/:customerId" element={<Suspense fallback={null}><CustomerDetail /></Suspense>} />
                 <Route path="/workspaces/new" element={<Suspense fallback={null}><CreateWorkspace /></Suspense>} />
                 <Route path="/organization" element={<Suspense fallback={null}><OrganizationLayout /></Suspense>}>
                   <Route index element={<Navigate to="/organization/business" replace />} />

@@ -1,4 +1,4 @@
-import { Buildings, CaretDown, Coin, GearSix, Globe, Monitor, Moon, SquaresFour, Sun } from '@phosphor-icons/react'
+import { AddressBook, Buildings, CaretDown, Coin, GearSix, Globe, Monitor, Moon, SquaresFour, Sun } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import LocaleMenu from './LocaleMenu'
@@ -10,6 +10,7 @@ import { useTranslation } from '../hooks/useTranslation'
 // t(`nav.sidebar.links.${key}`) template typecheck against the dictionary.
 const mainLinks = [
   { to: '/', key: 'dashboard', icon: SquaresFour, end: true },
+  { to: '/customers', key: 'customers', icon: AddressBook },
   { to: '/organization', key: 'organization', icon: Buildings },
   { to: '/billing', key: 'billing', icon: Coin },
   { to: '/settings', key: 'settings', icon: GearSix },
