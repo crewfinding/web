@@ -49,13 +49,20 @@ personal workspace; a manager or member of an active workspace sees no card.
 
 ## Activity log
 
-The mobile app has no activity log (Reports → Log renders sample rows). The web adds one, as asked,
-on the API's audit trail: `GET /audit` through `@fonderie/react-audit`'s `useAuditEvents`, for those
-who may read it — `usePermissions().can('read', 'audit')` (the owner and managers hold every right; a
-custom role gets it with the "Activity log" switch). Section nav "Activity log" (shown only then) →
-`/organization/activity`. Rows newest first: when (date preference + time), who (member name, "System"
-without an actor, "A former member" for someone no longer on the team), what (the event type), details
-on demand; "Show more" pages on. Without the right: a notice, no request.
+The mobile app now has the same log (its `utils/activity.ts` + `LogScreen`), and the web follows it:
+the API's audit trail, `GET /audit` through `@fonderie/react-audit`'s `useAuditEvents`, for those who
+may read it — `usePermissions().can('read', 'audit')` (the owner and managers hold every right; a
+custom role gets it with the "Activity log" switch). Section nav "Activity log" (Team group, or the
+Business group in a personal workspace; shown only then) → `/organization/activity`.
+
+Rows newest first, grouped by day ("Today", "Yesterday", then the date preference): who (member name,
+"System" without an actor, "A former member" for someone no longer on the team — the rest of the team
+is read while a name is missing), what (one sentence per event type, `src/lib/activity.ts` — the app's
+80 types, en/fr/es verbatim; anything else "Something changed" plus its raw type), when ("Just now",
+"5 min ago", "3 h ago" today; the time of day before). Opening a row shows the exact date and time and
+"Open the job / quote / invoice / bill of lading / customer" when the web has that page — none yet
+(`ACTIVITY_ROUTES` is empty until those pages ship). "Show more" pages on; a failed later page says so
+under the list with "Try again". Without the right: a notice, no request.
 
 ## Undo bins
 
