@@ -48,3 +48,15 @@ export function parseUserAgent(ua: string | null | undefined): ParsedUserAgent {
   const { os, device } = matchOs(ua)
   return { browser, os, device, summary: `${browser} • ${os}` }
 }
+
+// This visitor's phone platform, if any — to offer opening a link in the
+// mobile app. iPadOS reports a desktop Mac user agent; touch tells them apart.
+export function mobilePlatform(
+  ua: string = typeof navigator === 'undefined' ? '' : navigator.userAgent,
+  maxTouchPoints: number = typeof navigator === 'undefined' ? 0 : navigator.maxTouchPoints,
+): 'ios' | 'android' | null {
+  if (/\b(iPhone|iPad|iPod)\b/.test(ua)) return 'ios'
+  if (/\bMacintosh\b/.test(ua) && maxTouchPoints > 1) return 'ios'
+  if (/\bAndroid\b/.test(ua)) return 'android'
+  return null
+}

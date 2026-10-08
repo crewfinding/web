@@ -14,6 +14,7 @@ import AppLayout from './layouts/AppLayout'
 import AuthLayout from './layouts/AuthLayout'
 import Billing from './pages/Billing'
 import ForgotPassword from './pages/ForgotPassword'
+import Invite from './pages/Invite'
 import Join from './pages/Join'
 import AuthCallback from './pages/AuthCallback'
 import Login from './pages/Login'
@@ -78,6 +79,8 @@ createRoot(document.getElementById('root')!).render(
               {/* Joining a team: signed out it asks to sign in or sign up
                   and comes back; signed in it redeems the email's code */}
               <Route path="/join" element={<Join />} />
+              {/* The invitation email's link (INVITATION_URL on the API) */}
+              <Route path="/invite/:token" element={<Invite />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

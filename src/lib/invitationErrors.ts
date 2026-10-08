@@ -8,14 +8,20 @@ import type { MessageParams } from '../locales/types'
 export interface InvitationRefusal {
   message: string
   wrongAccount: boolean
+  /** Worth trying again as is: connectivity, rate limit, an unexpected failure. */
+  retryable: boolean
 }
 
 type T = (key: TranslationKey, params?: MessageParams) => string
 
 export function describeInvitationError(t: T, err: unknown): InvitationRefusal {
-  const plain = (key: TranslationKey, params?: MessageParams) => ({ message: t(key, params), wrongAccount: false })
+  const plain = (key: TranslationKey, params?: MessageParams, retryable = false) => ({
+    message: t(key, params),
+    wrongAccount: false,
+    retryable,
+  })
   // status 0 = no HTTP response (offline, CORS, a client-side throw)
-  if (!(err instanceof FonderieApiError) || err.status === 0) return plain('invite.errors.network')
+  if (!(err instanceof FonderieApiError) || err.status === 0) return plain('invite.errors.network', undefined, true)
   switch (err.reason) {
     case 'INVITATION_EMAIL_MISMATCH': {
       // The server sends the invited address masked (a***@acme.example)
@@ -25,6 +31,7 @@ export function describeInvitationError(t: T, err: unknown): InvitationRefusal {
           email: typeof email === 'string' && email ? email : t('invite.errors.emailFallback'),
         }),
         wrongAccount: true,
+        retryable: false,
       }
     }
     case 'INVITATION_EXPIRED':
@@ -39,8 +46,8 @@ export function describeInvitationError(t: T, err: unknown): InvitationRefusal {
     case 'INVITATION_NOT_FOUND':
       return plain('invite.errors.notFound')
     case 'RATE_LIMITED':
-      return plain('invite.errors.rateLimited')
+      return plain('invite.errors.rateLimited', undefined, true)
   }
-  if (err.status === 429) return plain('invite.errors.rateLimited')
-  return plain('invite.errors.network')
+  if (err.status === 429) return plain('invite.errors.rateLimited', undefined, true)
+  return plain('invite.errors.network', undefined, true)
 }
