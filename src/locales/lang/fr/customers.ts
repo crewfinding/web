@@ -164,6 +164,7 @@ const customers: typeof enCustomers = {
     search: 'Adresse',
     unit: 'App. / Bureau / Suite (optionnel)',
     unitPlaceholder: 'ex. 4B',
+    buzzer: 'N° d’interphone (optionnel)',
     change: 'Changer l’adresse',
     imprecise: 'Choisissez un résultat plus précis : une adresse civique, pas une ville ni une région.',
     required: 'Recherchez l’adresse et choisissez-la parmi les suggestions.',

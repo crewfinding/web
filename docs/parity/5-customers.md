@@ -121,7 +121,7 @@ blacklist", "Archive" / "Restore from archive" (all `update`), "Delete customer"
 |---|---|---|---|
 | Phone | "Add phone": "Number" (phone input) + "Label" chips mobile / office / home / fax / other (+ "Custom label (leave blank for "other")") | "No phone on file" | label · value · "primary" badge · ⋯ |
 | Email | "Add email": "Address" + chips work / personal / billing / other | "No email on file" | same |
-| Address | "Add address" (§5) | "No address on file" | label · "unit, street, city, zip, prov, country" · badge · ⋯ |
+| Address | "Add address" (§5) | "No address on file" | label · "street, Unit 4B, city prov zip, country · Buzzer 12" · badge · ⋯ |
 | Notes | "Add note": "Note" ("Write a note…", ≤ 10000) | "No notes yet" | body, date, ⋯ |
 | Tags | "Add tag": "Tag" ("vip, repeat, referral…", lower-cased, ≤ 100) | "No tags" | chip × "Remove tag {tag}" → "Remove tag" / "Remove "{tag}"?" |
 | Relationships | "Link a contact": "Customer" picker + "Relationship" chips contact / employee / employer / spouse / partner / subsidiary / other (+ "e.g. accountant, contractor…") → "Add relationship" | "No linked contacts" | name (opens it), relationship · phone, badge, ⋯ |
@@ -155,17 +155,13 @@ places search (`POST /places/autocomplete` ≥ 3 chars, 300 ms; `GET /places/:pl
 "Find a specific address on the map…". A place without street, city, province / state, postal code
 or country → "Pick a more precise result — a street address, not a city or a region."; nothing
 picked → "Search for the address and pick it from the suggestions."; once picked a summary +
-"Change address". Typed: "Unit / Apt # (optional)" ("e.g. 4B") only. "Label": service / billing /
-other. Saved as `line1` street, `line2` city, `unit`, `subdivision1Iso`, `zipPostalCode`,
-`countryIso` (the server normalizes them).
+"Change address". Typed: "Unit / Apt # (optional)" ("e.g. 4B") and "Buzzer # (optional)" (≤ 20)
+only. "Label": service / billing / other. Saved as `line1` street, `unit`, `city`, `subdivision1Iso`,
+`zipPostalCode`, `countryIso`, `latitude` / `longitude` from the pick, `accessCode` the buzzer
+(@fonderie/customers 6.10; the server normalizes them).
 
-Differences from the mobile sheet, and why:
-- Mobile lets the parts be typed and edited after a search; the web is search-only (the business
-  rule, as asked).
-- Mobile drops the city (the customer address has no city field); the web keeps it in `line2`, which
-  every client already prints.
-- **No buzzer**: the customer address model (`IAddressDTO`: unit, line1, line2, zip, subdivision,
-  country) has no buzzer / access-code field, so the web does not ask for one it could not save.
+Same on mobile (AddAddressSheet): search-only, Unit / Suite and Buzzer typed, the city and point
+saved. An address written before customers 6.10 may hold its city in `line2`; rows still print it.
 
 ## Refusals (reason → message)
 

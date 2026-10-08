@@ -16,6 +16,7 @@ import {
   ENTRY_MAX,
   LABEL_DEFAULTS,
   RELATIONSHIP_SUGGESTIONS,
+  addressLine,
   addressProblem,
   canShowMore,
   customerDisplayName,
@@ -253,11 +254,11 @@ export function EntryDialog({
 /**
  * Add an address: ONLY from the places search (the business locations'
  * rule) — a place without street, city, province / state, postal code or
- * country is refused; the unit is the one typed part.
+ * country is refused; the unit and the buzzer are the typed parts.
  */
 export function AddressDialog({ onClose, onSave }: { onClose: () => void; onSave: (draft: IAddressDraft) => Promise<unknown> }) {
   const { t } = useTranslation()
-  const [d, setD] = useState<IAddressDraft>({ place: null, unit: '', label: 'service' })
+  const [d, setD] = useState<IAddressDraft>({ place: null, unit: '', accessCode: '', label: 'service' })
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(true)
   const [imprecise, setImprecise] = useState(false)
@@ -275,7 +276,9 @@ export function AddressDialog({ onClose, onSave }: { onClose: () => void; onSave
     setSearching(false)
     setQuery('')
   }
-  const summary = d.place ? [d.place.line1, d.place.city, `${d.place.state} ${d.place.zip}`.trim(), d.place.country].filter(Boolean).join(', ') : ''
+  const summary = d.place
+    ? addressLine({ line1: d.place.line1, city: d.place.city, subdivision1Iso: d.place.state, zipPostalCode: d.place.zip, countryIso: d.place.country })
+    : ''
 
   return (
     <FormDialog
@@ -320,6 +323,13 @@ export function AddressDialog({ onClose, onSave }: { onClose: () => void; onSave
         placeholder={t('customers.address.unitPlaceholder')}
         onChange={(e) => setD((prev) => ({ ...prev, unit: e.target.value }))}
         data-testid="address-unit"
+      />
+      <Input
+        label={t('customers.address.buzzer')}
+        value={d.accessCode}
+        maxLength={CUSTOMER_LIMITS.accessCode}
+        onChange={(e) => setD((prev) => ({ ...prev, accessCode: e.target.value }))}
+        data-testid="address-buzzer"
       />
       <LabelChips chips={ADDRESS_LABEL_CHIPS} value={d.label} onChange={(label) => setD((prev) => ({ ...prev, label }))} />
     </FormDialog>

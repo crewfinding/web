@@ -244,6 +244,7 @@ export const CUSTOMER_LIMITS = {
   email: 254,
   phone: 30,
   unit: 50,
+  accessCode: 20,
 } as const
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -423,10 +424,12 @@ export const missingPlaceParts = (p: IAddressParts): ('line1' | 'city' | 'state'
   (['line1', 'city', 'state', 'zip', 'country'] as const).filter((k) => !p[k]?.trim())
 
 export interface IAddressDraft {
-  /** The picked place — the only source of the address. */
+  /** The picked place — the only source of the address (street, city, province / state, postal code, country, point). */
   place: IAddressParts | null
-  /** Typed: Unit / Apt #. */
+  /** Typed: Unit / Suite. */
   unit: string
+  /** Typed: the buzzer / door code. */
+  accessCode: string
   label: string
 }
 
@@ -438,27 +441,57 @@ export function addressProblem(d: IAddressDraft): TranslationKey | null {
 }
 
 /**
- * The address as the server stores it: the street in line1, the city in line2
- * (the customer address has no city field), the unit typed, the rest from the
- * place. The first address is the primary one.
+ * The address as the server stores it: everything but the unit and the buzzer
+ * from the picked place — the city and the point included — and those two as
+ * typed. The first address is the primary one.
  */
 export function addressInput(d: IAddressDraft, isFirst: boolean): IAddAddressInput {
   const p = d.place!
   return {
     line1: p.line1.trim(),
-    line2: p.city.trim() || null,
     unit: d.unit.trim() || null,
+    city: p.city.trim() || null,
     subdivision1Iso: p.state.trim().toUpperCase(),
     zipPostalCode: p.zip.trim(),
     countryIso: p.country.trim().toUpperCase(),
+    accessCode: d.accessCode.trim() || null,
+    latitude: p.lat,
+    longitude: p.lng,
     label: d.label,
     isPrimary: isFirst,
   }
 }
 
-/** "4B, 123 Main St, Montréal, H2X 1Y4, QC, CA" — what a row shows. */
-export function addressText(a: Pick<ICustomerAddressDTO, 'address'>): string {
-  if (!a?.address) return ''
-  const x = a.address
-  return [x.unit, x.line1, x.line2, x.zipPostalCode, x.subdivision1Iso, x.countryIso].filter(Boolean).join(', ')
+/** "Unit 4B" / "Buzzer 12" — the words a one-line address uses. */
+export interface IAddressWords {
+  unit: (unit: string) => string
+  buzzer: (code: string) => string
+}
+
+type IAddressFields = Partial<Record<'line1' | 'line2' | 'unit' | 'city' | 'subdivision1Iso' | 'zipPostalCode' | 'countryIso' | 'accessCode', string | null>>
+
+/**
+ * "1 Main St, Unit 4B, Montréal QC H2X 1Y4, CA · Buzzer 12" — what a row shows.
+ * Without `words` (a maps search, a menu title) the unit is bare and the
+ * buzzer left out. `line2` stays for an address written before the city had
+ * its own field.
+ */
+export function addressLine(x: IAddressFields | null | undefined, words: IAddressWords | null = null): string {
+  if (!x) return ''
+  const v = (s: string | null | undefined) => (s ?? '').trim()
+  const unit = v(x.unit)
+  const line = [
+    v(x.line1),
+    unit ? (words ? words.unit(unit) : unit) : '',
+    v(x.line2),
+    [v(x.city), v(x.subdivision1Iso).replace(/^[A-Z]{2}-/, ''), v(x.zipPostalCode)].filter(Boolean).join(' '),
+    v(x.countryIso),
+  ].filter(Boolean).join(', ')
+  const code = v(x.accessCode)
+  return code && words ? `${line} · ${words.buzzer(code)}` : line
+}
+
+/** A customer address row on one line (see addressLine). */
+export function addressText(a: Pick<ICustomerAddressDTO, 'address'>, words: IAddressWords | null = null): string {
+  return a?.address ? addressLine(a.address, words) : ''
 }

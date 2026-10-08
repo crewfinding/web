@@ -15,12 +15,12 @@
 		"check:brand": "node scripts/check-brand.mjs"
 	},
 	"dependencies": {
-		"@fonderie/client": "^3.22.0",
+		"@fonderie/client": "^3.23.0",
 		"@fonderie/react": "^0.11.0",
 		"@fonderie/react-audit": "^0.4.2",
 		"@fonderie/react-auth": "^0.13.0",
 		"@fonderie/react-billing": "^0.11.4",
-		"@fonderie/react-customers": "^0.7.0",
+		"@fonderie/react-customers": "^0.8.0",
 		"@fonderie/react-media": "^0.2.8",
 		"@fonderie/react-workspaces": "^0.14.0",
 		"@phosphor-icons/react": "^2.1.10",

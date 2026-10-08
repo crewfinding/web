@@ -164,6 +164,7 @@ const customers: typeof enCustomers = {
     search: 'Dirección',
     unit: 'Unidad / Apto # (opcional)',
     unitPlaceholder: 'ej. 4B',
+    buzzer: 'N.º de portero (opcional)',
     change: 'Cambiar la dirección',
     imprecise: 'Elige un resultado más preciso: una dirección con calle y número, no una ciudad ni una región.',
     required: 'Busca la dirección y elígela entre las sugerencias.',

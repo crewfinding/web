@@ -6,6 +6,7 @@ import { translate, type TranslationKey } from '../locales'
 import {
   EMPTY_IDENTITY,
   addressInput,
+  addressLine,
   addressProblem,
   addressText,
   binAction,
@@ -161,7 +162,7 @@ describe('the undo bin', () => {
 
 describe('addresses: only from the places search', () => {
   const place: IAddressParts = { line1: '1 Main St', city: 'Montréal', state: 'QC', zip: 'H2X 1Y4', country: 'CA', lat: 45.5, lng: -73.6 }
-  const draft = (p: IAddressParts | null, unit = ''): IAddressDraft => ({ place: p, unit, label: 'service' })
+  const draft = (p: IAddressParts | null, unit = '', accessCode = ''): IAddressDraft => ({ place: p, unit, accessCode, label: 'service' })
 
   it('nothing picked: search and pick', () => expect(addressProblem(draft(null))).toBe('customers.address.required'))
   it('a city or a region is not an address: pick a more precise result', () => {
@@ -169,23 +170,30 @@ describe('addresses: only from the places search', () => {
     expect(missingPlaceParts({ ...place, zip: ' ', state: '' })).toEqual(['state', 'zip'])
     expect(addressProblem(draft({ ...place, line1: '' }))).toBe('customers.address.imprecise')
   })
-  it('a full place is saved as the server stores it: street, city in line2, the typed unit, the first one primary', () => {
-    expect(addressProblem(draft(place, ' 4B '))).toBeNull()
-    expect(addressInput(draft(place, ' 4B '), true)).toEqual({
+  it('a full place is saved as the server stores it: city and point from the pick, the typed unit and buzzer, the first one primary', () => {
+    expect(addressProblem(draft(place, ' 4B ', ' 1234 '))).toBeNull()
+    expect(addressInput(draft(place, ' 4B ', ' 1234 '), true)).toEqual({
       line1: '1 Main St',
-      line2: 'Montréal',
       unit: '4B',
+      city: 'Montréal',
       subdivision1Iso: 'QC',
       zipPostalCode: 'H2X 1Y4',
       countryIso: 'CA',
+      accessCode: '1234',
+      latitude: 45.5,
+      longitude: -73.6,
       label: 'service',
       isPrimary: true,
     })
-    expect(addressInput(draft(place), false)).toMatchObject({ unit: null, isPrimary: false })
+    expect(addressInput(draft(place), false)).toMatchObject({ unit: null, accessCode: null, isPrimary: false })
+    expect(addressInput(draft(place), false)).not.toHaveProperty('line2')
   })
-  it('a row reads unit, street, city, postal code, province, country', () => {
-    const a = { address: { unit: '4B', line1: '1 Main St', line2: 'Montréal', zipPostalCode: 'H2X 1Y4', subdivision1Iso: 'QC', subdivision2Iso: '', countryIso: 'CA' } }
-    expect(addressText(a)).toBe('4B, 1 Main St, Montréal, H2X 1Y4, QC, CA')
+  it('a row reads street, unit, city province postal code, country, then the buzzer', () => {
+    const words = { unit: (u: string) => `Unit ${u}`, buzzer: (c: string) => `Buzzer ${c}` }
+    const a = { address: { unit: '4B', line1: '1 Main St', line2: '', city: 'Montréal', zipPostalCode: 'H2X 1Y4', subdivision1Iso: 'QC', subdivision2Iso: '', countryIso: 'CA', accessCode: '1234', latitude: 45.5, longitude: -73.6 } }
+    expect(addressText(a, words)).toBe('1 Main St, Unit 4B, Montréal QC H2X 1Y4, CA · Buzzer 1234')
+    expect(addressText(a)).toBe('1 Main St, 4B, Montréal QC H2X 1Y4, CA')
+    expect(addressLine({ ...a.address, subdivision1Iso: 'CA-QC', unit: '', accessCode: '' }, words)).toBe('1 Main St, Montréal QC H2X 1Y4, CA')
   })
 })
 

@@ -168,6 +168,7 @@ const customers = {
     search: 'Address',
     unit: 'Unit / Apt # (optional)',
     unitPlaceholder: 'e.g. 4B',
+    buzzer: 'Buzzer # (optional)',
     change: 'Change address',
     imprecise: 'Pick a more precise result — a street address, not a city or a region.',
     required: 'Search for the address and pick it from the suggestions.',

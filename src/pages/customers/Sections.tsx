@@ -113,6 +113,11 @@ function ContactRow({
 
 export function CustomerSections({ customer, canEdit }: { customer: ICustomerDetailDTO; canEdit: boolean }) {
   const { t } = useTranslation()
+  // One wording for every address in the app: the business locations' "Unit 4B" / "Buzzer 12".
+  const words = {
+    unit: (u: string) => t('business.locations.unitInline', { unit: u }),
+    buzzer: (c: string) => t('business.locations.buzzerInline', { code: c }),
+  }
   const formatDate = useDatePreference()
   const country = useDefaultCountry()
   const id = customer.id
@@ -242,7 +247,7 @@ export function CustomerSections({ customer, canEdit }: { customer: ICustomerDet
             <ContactRow
               key={a.id}
               label={customerLabelText(t, a.label)}
-              value={addressText(a)}
+              value={addressText(a, words)}
               isPrimary={a.isPrimary}
               onLabel={canEdit ? () => setLabelTarget({ kind: 'address', id: a.id, label: a.label }) : undefined}
               menu={menuFor({ kind: 'address', id: a.id, isPrimary: a.isPrimary, text: addressText(a) })}
