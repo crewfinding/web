@@ -9,6 +9,17 @@ import { useCurrentWorkspace } from '../lib/workspace'
 import { WORKSPACE_MENU_TRIGGER_ID } from '../lib/workspaceMenu'
 import { useTranslation } from '../hooks/useTranslation'
 
+function ArchivedBadge({ label, testId }: { label: string; testId?: string }) {
+  return (
+    <span
+      data-testid={testId}
+      className="shrink-0 rounded-sm border border-warning/40 bg-warning/10 px-1.5 py-0.5 text-[11px] font-semibold text-warning"
+    >
+      {label}
+    </span>
+  )
+}
+
 // Which workspace the office is working in. Everything on screen — jobs,
 // customers, team, plan — belongs to it; switching re-reads it all.
 export default function WorkspaceMenu({ className = '' }: { className?: string }) {
@@ -36,6 +47,7 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
         className="flex h-9 max-w-[220px] cursor-pointer items-center gap-1.5 rounded-md border border-hairline px-3 text-sm text-ink hover:bg-surface-2"
       >
         <span className="truncate">{nameOf(current)}</span>
+        {current.isArchived ? <ArchivedBadge label={t('org.workspace.badge')} /> : null}
         <CaretDown size={14} aria-hidden="true" className="shrink-0 text-ink-subtle" />
       </button>
       {open && (
@@ -55,6 +67,8 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
             >
               <span className="w-4 shrink-0">{w.id === current.id && <Check size={14} aria-hidden="true" />}</span>
               <span className="truncate">{nameOf(w)}</span>
+              {/* Read-only until the owner restores it; it can still be opened and read. */}
+              {w.isArchived ? <ArchivedBadge label={t('org.workspace.badge')} testId={`workspace-archived-${w.id}`} /> : null}
             </button>
           ))}
           <Link

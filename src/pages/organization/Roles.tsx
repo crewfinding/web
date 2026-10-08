@@ -18,6 +18,9 @@ import { Notice } from '../../components/Notice'
 import { useConfirm } from '../../hooks/useConfirm'
 import { useDatePreference } from '../../hooks/useDatePreference'
 import { useTranslation } from '../../hooks/useTranslation'
+import { ArchivedWorkspaceBanner } from '../../components/ArchivedWorkspaceBanner'
+import { useWorkspaceArchived } from '../../hooks/useWorkspaceArchived'
+import { canWriteRoles } from '../../lib/lifecycle'
 import { ROLES, deleteMessage, membersHolding, roleActionError, roleDisplayName } from '../../lib/roles'
 import { LoadErrorState, LoadingState, SystemRoleRights } from '../../components/RoleParts'
 import { useCurrentWorkspace } from '../../lib/workspace'
@@ -114,8 +117,11 @@ function RolesContent() {
   const { t } = useTranslation()
   const { roles, isLoading, error, refresh, removeRole } = useRoles()
   const { members, isLoading: membersLoading, error: membersError, refresh: refreshMembers } = useMembers()
-  const { isManager, isOwner, isLoading: permsLoading, refresh: refreshPerms } = usePermissions()
+  const { isManager: manager, isOwner, isLoading: permsLoading, refresh: refreshPerms } = usePermissions()
   const { refresh: refreshCatalog } = usePermissionCatalog()
+  // Archived: read-only (409 WORKSPACE_ARCHIVED) — no create, delete, restore.
+  const { isArchived } = useWorkspaceArchived()
+  const isManager = canWriteRoles(manager, isArchived)
   const { refresh: refreshBin } = useDeletedRoles()
   const { confirm, element: confirmDialog } = useConfirm()
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -180,7 +186,8 @@ function RolesContent() {
         <h2 className="text-card-title text-ink">{t('roles.title')}</h2>
         <p className="mt-1 text-sm text-ink-subtle">{t('roles.intro')}</p>
       </div>
-      {!permsLoading && !isManager ? <Notice>{t('roles.readonly')}</Notice> : null}
+      <ArchivedWorkspaceBanner />
+      {!permsLoading && !manager ? <Notice>{t('roles.readonly')}</Notice> : null}
 
       {isLoading && roles.length === 0 ? (
         <LoadingState label={t('roles.loading')} />

@@ -1,13 +1,16 @@
-import { Buildings, CreditCard, ShieldCheck, UsersThree } from '@phosphor-icons/react'
+import { usePermissions } from '@fonderie/react-workspaces'
+import { Buildings, ClockCounterClockwise, CreditCard, ShieldCheck, UsersThree } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { WorkspaceArchiveCard } from '../../components/WorkspaceArchiveCard'
 import { useTranslation } from '../../hooks/useTranslation'
 import type { TranslationKey } from '../../locales'
 import { cn } from '../../lib/cn'
 import { useCurrentWorkspace } from '../../lib/workspace'
 
 // The Organization area — the mobile app's Organization screen as a section
-// nav: Business Info, Team Members, Roles & Permissions and Billing. A personal
+// nav: Business Info, Team Members, Roles & Permissions, Activity log and
+// Billing, then the owner's Workspace card (archive / restore). A personal
 // workspace has no team: its team links are not offered (their pages still
 // answer with the personal-workspace explanation).
 interface ISection {
@@ -15,6 +18,8 @@ interface ISection {
   label: TranslationKey
   icon: Icon
   team?: boolean
+  /** Shown only to those who may read the activity log. */
+  audit?: boolean
   end?: boolean
 }
 
@@ -22,6 +27,7 @@ const SECTIONS: ISection[] = [
   { to: '/organization/business', label: 'org.nav.info', icon: Buildings },
   { to: '/organization/members', label: 'org.nav.members', icon: UsersThree, team: true },
   { to: '/organization/roles', label: 'org.nav.roles', icon: ShieldCheck, team: true },
+  { to: '/organization/activity', label: 'org.nav.activity', icon: ClockCounterClockwise, audit: true },
   { to: '/billing', label: 'org.nav.billing', icon: CreditCard },
 ]
 
@@ -29,7 +35,9 @@ export default function OrganizationLayout() {
   const { t } = useTranslation()
   const { current } = useCurrentWorkspace()
   const isPersonal = current?.isPersonal === true
-  const sections = SECTIONS.filter((s) => !(s.team && isPersonal))
+  const { can } = usePermissions()
+  const { pathname } = useLocation()
+  const sections = SECTIONS.filter((s) => !(s.team && isPersonal) && !(s.audit && !can('read', 'audit')))
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -59,6 +67,12 @@ export default function OrganizationLayout() {
         </nav>
         <div className="min-w-0 flex-1">
           <Outlet />
+          {/* The mobile app's Organization hub ends with the Workspace card. */}
+          {pathname === '/organization/business' ? (
+            <div className="mt-4">
+              <WorkspaceArchiveCard />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

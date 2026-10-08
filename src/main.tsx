@@ -33,6 +33,7 @@ const OrganizationLayout = lazy(() => import('./pages/organization/OrganizationL
 const Members = lazy(() => import('./pages/organization/Members'))
 const InviteMember = lazy(() => import('./pages/organization/InviteMember'))
 const Business = lazy(() => import('./pages/organization/Business'))
+const Activity = lazy(() => import('./pages/organization/Activity'))
 const Roles = lazy(() => import('./pages/organization/Roles'))
 const RoleDetail = lazy(() => import('./pages/organization/RoleDetail'))
 const CreateRole = lazy(() => import('./pages/organization/CreateRole'))
@@ -74,6 +75,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="business" element={<Suspense fallback={null}><Business /></Suspense>} />
                   <Route path="members" element={<Suspense fallback={null}><Members /></Suspense>} />
                   <Route path="members/invite" element={<Suspense fallback={null}><InviteMember /></Suspense>} />
+                  <Route path="activity" element={<Suspense fallback={null}><Activity /></Suspense>} />
                   <Route path="roles" element={<Suspense fallback={null}><Roles /></Suspense>} />
                   <Route path="roles/new" element={<Suspense fallback={null}><CreateRole /></Suspense>} />
                   <Route path="roles/:roleId" element={<Suspense fallback={null}><RoleDetail /></Suspense>} />

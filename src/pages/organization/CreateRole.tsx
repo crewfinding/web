@@ -9,6 +9,8 @@ import { Notice } from '../../components/Notice'
 import { useTranslation } from '../../hooks/useTranslation'
 import { ROLES, descriptionProblem, nameProblem, roleActionError } from '../../lib/roles'
 import { useCurrentWorkspace } from '../../lib/workspace'
+import { ArchivedWorkspaceBanner } from '../../components/ArchivedWorkspaceBanner'
+import { useWorkspaceArchived } from '../../hooks/useWorkspaceArchived'
 import { LoadErrorState, LoadingState } from '../../components/RoleParts'
 
 // Create a role — the mobile app's CreateRoleScreen (docs/parity/2-roles.md).
@@ -21,6 +23,7 @@ function CreateRoleContent() {
   const { createRole } = useRoles()
   const { isManager, isLoading: meLoading, error: meError, refresh: refreshMe } = usePermissions()
   const [error, setError] = useState<string | null>(null)
+  const { isArchived } = useWorkspaceArchived()
 
   const {
     register,
@@ -41,6 +44,16 @@ function CreateRoleContent() {
 
   if (meLoading) return <LoadingState label={t('roles.loading')} />
   if (meError && !isManager) return <LoadErrorState error={meError} onRetry={() => void refreshMe({ force: true })} />
+  if (isArchived) {
+    return (
+      <div className="space-y-3">
+        <ArchivedWorkspaceBanner />
+        <Button variant="secondary" onClick={() => navigate(ROLES)}>
+          {t('roles.back')}
+        </Button>
+      </div>
+    )
+  }
   if (!isManager) {
     return (
       <div className="space-y-3">

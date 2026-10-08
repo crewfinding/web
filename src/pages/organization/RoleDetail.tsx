@@ -27,6 +27,9 @@ import {
   sameGrid,
 } from '../../lib/roles'
 import { useCurrentWorkspace } from '../../lib/workspace'
+import { ArchivedWorkspaceBanner } from '../../components/ArchivedWorkspaceBanner'
+import { useWorkspaceArchived } from '../../hooks/useWorkspaceArchived'
+import { canWriteRoles } from '../../lib/lifecycle'
 import { LoadErrorState, LoadingState, SystemRoleRights } from '../../components/RoleParts'
 
 // A role — the mobile app's RoleDetailScreen (docs/parity/2-roles.md).
@@ -43,7 +46,9 @@ function RoleDetailContent({ roleId }: { roleId: string }) {
     useRolePermissions(roleId)
   const { catalog, declared, isLoading: catalogLoading, error: catalogError, refresh: refreshCatalog } =
     usePermissionCatalog()
-  const { isManager, isLoading: meLoading } = usePermissions()
+  const { isManager: manager, isLoading: meLoading } = usePermissions()
+  const { isArchived } = useWorkspaceArchived()
+  const isManager = canWriteRoles(manager, isArchived)
   const { updateRole } = useRoles()
 
   // Only the switches the user flipped; the rest read from the server.
@@ -132,9 +137,10 @@ function RoleDetailContent({ roleId }: { roleId: string }) {
   const header = (
     <div className="space-y-3">
       <h2 className="text-card-title text-ink">{roleDisplayName(role, t)}</h2>
+      <ArchivedWorkspaceBanner />
       {role.isSystem ? (
         <p className="text-sm text-ink-subtle">{t('roles.system.readonly')}</p>
-      ) : !meLoading && !isManager ? (
+      ) : !meLoading && !manager ? (
         <Notice>{t('roles.detail.readonly')}</Notice>
       ) : null}
       {saveError ? <Notice tone="error">{saveError}</Notice> : null}
