@@ -1,0 +1,171 @@
+import type enTeam from '../en/team'
+
+const team: typeof enTeam = {
+  title: 'Équipe',
+  intro: 'Les personnes qui travaillent dans cet espace, et les invitations en attente de réponse.',
+  loading: 'Chargement de l’équipe',
+  retry: 'Réessayer',
+  noAccess: {
+    text: 'Vous n’êtes plus membre de cet espace de travail, ou il a été fermé.',
+    switch: 'Changer d’espace',
+  },
+  personal: {
+    title: 'Votre espace personnel',
+    text: 'Un espace personnel n’est que pour vous — il n’a pas d’équipe. Pour travailler avec une équipe, créez un espace d’entreprise et invitez-la.',
+    create: 'Créer un espace d’entreprise',
+  },
+  seats: 'Places utilisées : {used} / {limit}',
+  inviteButton: 'Inviter un membre',
+  members: {
+    title: 'Membres',
+    empty: 'Vous êtes seul pour l’instant. Invitez votre équipe par courriel — chacun remplit ses propres informations.',
+    emptyMember: 'Vous êtes seul pour l’instant. Le propriétaire ou un gestionnaire peut inviter d’autres personnes.',
+  },
+  pending: {
+    title: 'Invitations en attente',
+  },
+  row: {
+    self: '{name} (vous)',
+    actions: 'Actions pour {name}',
+  },
+  badge: {
+    owner: 'Propriétaire',
+    manager: 'Gestionnaire',
+    paused: 'Suppressions suspendues',
+  },
+  role: {
+    guest: 'Membre',
+    admin: 'Gestionnaire',
+    owner: 'Propriétaire',
+  },
+  action: {
+    roles: 'Rôles…',
+    makeManager: 'Nommer gestionnaire',
+    unsetManager: 'Retirer les droits de gestionnaire',
+    transfer: 'Transférer la propriété',
+    releaseBrake: 'Autoriser à nouveau les suppressions',
+    remove: 'Retirer de l’équipe',
+    leave: 'Quitter l’équipe',
+    revoke: 'Révoquer',
+  },
+  confirm: {
+    cancel: 'Annuler',
+    makeManager: {
+      title: 'Nommer gestionnaire ?',
+      text: '{name} pourra inviter et retirer des membres et attribuer des rôles.',
+    },
+    unsetManager: {
+      title: 'Retirer les droits de gestionnaire ?',
+      text: '{name} reste dans l’équipe avec ses autres rôles, mais ne peut plus la gérer.',
+    },
+    transfer: {
+      title: 'Transférer la propriété ?',
+      text: '{name} se voit proposer la propriété de {workspace}, avec un contrôle total, facturation comprise. Le transfert a lieu quand cette personne accepte ; vous restez dans l’équipe comme gestionnaire.',
+    },
+    remove: {
+      title: 'Retirer de l’équipe ?',
+      text: '{name} perd immédiatement l’accès à {workspace} — ses travaux, clients et documents. Il faudra une nouvelle invitation pour revenir.',
+    },
+    leave: {
+      title: 'Quitter l’équipe ?',
+      text: 'Vous perdez l’accès à {workspace} — ses travaux, clients et documents. Il vous faudra une nouvelle invitation pour revenir.',
+    },
+    revoke: {
+      title: 'Révoquer l’invitation ?',
+      text: 'Le lien envoyé à {email} ne fonctionnera plus.',
+    },
+  },
+  done: {
+    makeManager: '{name} est maintenant gestionnaire.',
+    unsetManager: '{name} n’est plus gestionnaire.',
+    transferOffered: 'Proposé à {name}. La propriété sera transférée à son acceptation.',
+    releaseBrake: '{name} peut à nouveau supprimer.',
+    remove: '{name} a été retiré de l’équipe.',
+    resend: 'Invitation renvoyée à {email}. L’ancien lien ne fonctionne plus.',
+    revoke: 'L’invitation à {email} a été révoquée.',
+  },
+  invitation: {
+    expires: 'Expire le {date}',
+    expired: 'Expirée — renvoyez-la',
+    resend: 'Renvoyer l’invitation à {email}',
+    revoke: 'Révoquer l’invitation à {email}',
+  },
+  roles: {
+    title: 'Rôles de {name}',
+    add: 'Ajouter {role}',
+    remove: '✓ {role} — retirer',
+    only: '✓ {role} — son seul rôle',
+    added: '{name} a maintenant le rôle {role}.',
+    removed: '{name} n’a plus le rôle {role}.',
+  },
+  offer: {
+    forYou: {
+      title: 'On vous propose cette équipe',
+      text: '{name} souhaite vous nommer propriétaire de {workspace}. L’offre expire le {date}.',
+    },
+    accept: 'Accepter',
+    decline: 'Refuser',
+    accepted: 'Vous êtes maintenant propriétaire de {workspace}.',
+    declined: 'Offre refusée.',
+    pending: {
+      title: 'Propriété proposée',
+      text: 'En attente de l’acceptation de {name}. L’offre expire le {date}.',
+    },
+    withdraw: 'Retirer l’offre',
+    withdrawn: 'Offre retirée.',
+    banner: {
+      text: 'On vous propose de devenir propriétaire de {workspace}.',
+      action: 'Examiner',
+    },
+  },
+  loadingMore: 'Chargement de la suite',
+  showMore: 'Afficher plus',
+  invite: {
+    title: 'Inviter un membre',
+    intro: 'Saisissez son adresse courriel. La personne reçoit un lien, crée son compte (ou se connecte) et remplit elle-même son nom, son téléphone et sa photo.',
+    email: 'Adresse courriel',
+    role: {
+      title: 'Rôle',
+      text: 'Facultatif. Sans rôle, la personne rejoint l’équipe comme membre : elle voit les clients et les modèles, et met à jour les travaux qui lui sont attribués.',
+      default: 'Membre (par défaut)',
+      none: 'La personne rejoint l’équipe comme membre. Créez des rôles personnalisés dans Rôles et permissions pour lui en donner plus.',
+    },
+    submit: 'Envoyer l’invitation',
+    cancel: 'Annuler',
+    error: {
+      member: 'Cette personne fait déjà partie de votre équipe.',
+      pending: 'Déjà invitée. Pour envoyer un nouveau lien, utilisez « renvoyer » dans la liste de l’équipe.',
+      empty: 'Ne peut pas être vide',
+      email: 'Veuillez saisir une adresse courriel valide',
+    },
+    managerOnly: 'Seuls le propriétaire ou un gestionnaire peuvent inviter des personnes dans cette équipe.',
+    personal: 'Un espace personnel n’a pas d’équipe. Créez un espace d’entreprise pour inviter des personnes.',
+  },
+  stepUp: {
+    title: 'Confirmez qu’il s’agit bien de vous',
+    mfa: 'Saisissez un code de votre application d’authentification (ou un code de secours).',
+    password: 'Saisissez votre mot de passe pour continuer.',
+    code: 'Nous vous enverrons un code de confirmation.',
+    codeSent: 'Saisissez le code envoyé à votre {channel}.',
+    channel: {
+      email: 'adresse courriel',
+      sms: 'téléphone',
+    },
+    useCode: 'M’envoyer un code',
+    sendCode: 'Envoyer le code',
+    confirm: 'Confirmer',
+    cancel: 'Annuler',
+    failed: 'La vérification a échoué. Réessayez.',
+  },
+  planLimit: {
+    title: 'Limite du forfait atteinte',
+    jobs: 'Votre forfait permet jusqu’à {count} travaux ouverts.',
+    seats: 'Votre forfait permet jusqu’à {count} membres.',
+    manager: 'Passez à un forfait supérieur pour en ajouter, ou terminez ou annulez des travaux ouverts.',
+    member: 'Demandez au propriétaire de l’espace ou à un administrateur de changer de forfait.',
+    notNow: 'Plus tard',
+    seePlans: 'Voir les forfaits',
+    ok: 'Ok',
+  },
+}
+export default team

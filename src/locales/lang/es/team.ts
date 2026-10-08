@@ -1,0 +1,171 @@
+import type enTeam from '../en/team'
+
+const team: typeof enTeam = {
+  title: 'Equipo',
+  intro: 'Las personas que trabajan en este espacio y las invitaciones que esperan respuesta.',
+  loading: 'Cargando el equipo',
+  retry: 'Reintentar',
+  noAccess: {
+    text: 'Ya no eres miembro de este espacio de trabajo, o se cerró.',
+    switch: 'Cambiar de espacio',
+  },
+  personal: {
+    title: 'Tu espacio personal',
+    text: 'Un espacio personal es solo para ti: no tiene equipo. Para trabajar con un equipo, crea un espacio de empresa e invítalo allí.',
+    create: 'Crear un espacio de empresa',
+  },
+  seats: 'Plazas usadas: {used} / {limit}',
+  inviteButton: 'Invitar a un miembro',
+  members: {
+    title: 'Miembros',
+    empty: 'Por ahora solo estás tú. Invita a tu equipo por correo: cada uno completa sus propios datos.',
+    emptyMember: 'Por ahora solo estás tú. El propietario o un gerente puede invitar a más personas.',
+  },
+  pending: {
+    title: 'Invitaciones pendientes',
+  },
+  row: {
+    self: '{name} (tú)',
+    actions: 'Acciones para {name}',
+  },
+  badge: {
+    owner: 'Propietario',
+    manager: 'Gerente',
+    paused: 'Eliminaciones pausadas',
+  },
+  role: {
+    guest: 'Miembro',
+    admin: 'Gerente',
+    owner: 'Propietario',
+  },
+  action: {
+    roles: 'Gestionar roles…',
+    makeManager: 'Hacer gerente',
+    unsetManager: 'Quitar derechos de gerente',
+    transfer: 'Transferir la propiedad',
+    releaseBrake: 'Permitir eliminar de nuevo',
+    remove: 'Quitar del equipo',
+    leave: 'Salir del equipo',
+    revoke: 'Revocar',
+  },
+  confirm: {
+    cancel: 'Cancelar',
+    makeManager: {
+      title: '¿Hacer gerente?',
+      text: '{name} podrá invitar y quitar miembros y asignar roles.',
+    },
+    unsetManager: {
+      title: '¿Quitar derechos de gerente?',
+      text: '{name} sigue en el equipo con sus otros roles, pero ya no podrá gestionarlo.',
+    },
+    transfer: {
+      title: '¿Transferir la propiedad?',
+      text: 'Se ofrece a {name} la propiedad de {workspace}, con control total, facturación incluida. Se traspasa cuando acepte, y tú sigues en el equipo como gerente.',
+    },
+    remove: {
+      title: '¿Quitar del equipo?',
+      text: '{name} pierde de inmediato el acceso a {workspace}: sus trabajos, clientes y documentos. Necesitará una nueva invitación para volver.',
+    },
+    leave: {
+      title: '¿Salir del equipo?',
+      text: 'Pierdes el acceso a {workspace}: sus trabajos, clientes y documentos. Necesitarás una nueva invitación para volver.',
+    },
+    revoke: {
+      title: '¿Revocar la invitación?',
+      text: 'El enlace enviado a {email} dejará de funcionar.',
+    },
+  },
+  done: {
+    makeManager: '{name} ahora es gerente.',
+    unsetManager: '{name} ya no es gerente.',
+    transferOffered: 'Ofrecido a {name}. La propiedad se traspasa cuando acepte.',
+    releaseBrake: '{name} puede volver a eliminar.',
+    remove: '{name} fue quitado del equipo.',
+    resend: 'Invitación reenviada a {email}. El enlace anterior ya no funciona.',
+    revoke: 'Se revocó la invitación a {email}.',
+  },
+  invitation: {
+    expires: 'Expira el {date}',
+    expired: 'Expirada: reenvíala',
+    resend: 'Reenviar la invitación a {email}',
+    revoke: 'Revocar la invitación a {email}',
+  },
+  roles: {
+    title: 'Roles de {name}',
+    add: 'Agregar {role}',
+    remove: '✓ {role}: quitar',
+    only: '✓ {role}: su único rol',
+    added: '{name} ahora tiene el rol {role}.',
+    removed: '{name} ya no tiene el rol {role}.',
+  },
+  offer: {
+    forYou: {
+      title: 'Te ofrecen este equipo',
+      text: '{name} quiere hacerte propietario de {workspace}. La oferta expira el {date}.',
+    },
+    accept: 'Aceptar',
+    decline: 'Rechazar',
+    accepted: 'Ahora eres el propietario de {workspace}.',
+    declined: 'Oferta rechazada.',
+    pending: {
+      title: 'Propiedad ofrecida',
+      text: 'Esperando a que {name} acepte. La oferta expira el {date}.',
+    },
+    withdraw: 'Retirar la oferta',
+    withdrawn: 'Oferta retirada.',
+    banner: {
+      text: 'Te ofrecieron la propiedad de {workspace}.',
+      action: 'Revisar',
+    },
+  },
+  loadingMore: 'Cargando más',
+  showMore: 'Mostrar más',
+  invite: {
+    title: 'Invitar a un miembro',
+    intro: 'Ingresa su correo. Recibirá un enlace, creará su cuenta (o iniciará sesión) y completará su nombre, teléfono y foto.',
+    email: 'Correo electrónico',
+    role: {
+      title: 'Rol',
+      text: 'Opcional. Sin rol se une como miembro: ve clientes y plantillas, y actualiza los trabajos que se le asignan.',
+      default: 'Miembro (predeterminado)',
+      none: 'Se une como miembro. Crea roles personalizados en Roles y permisos para darle más.',
+    },
+    submit: 'Enviar invitación',
+    cancel: 'Cancelar',
+    error: {
+      member: 'Esta persona ya está en tu equipo.',
+      pending: 'Ya está invitada. Para enviar un nuevo enlace, usa reenviar en la lista del equipo.',
+      empty: 'No puede estar vacío',
+      email: 'Ingresa un correo electrónico válido',
+    },
+    managerOnly: 'Solo el propietario o un gerente pueden invitar personas a este equipo.',
+    personal: 'Un espacio personal no tiene equipo. Crea un espacio de empresa para invitar a personas.',
+  },
+  stepUp: {
+    title: 'Confirma que eres tú',
+    mfa: 'Ingresa un código de tu aplicación de autenticación (o un código de respaldo).',
+    password: 'Ingresa tu contraseña para continuar.',
+    code: 'Te enviaremos un código para confirmar.',
+    codeSent: 'Ingresa el código que enviamos a tu {channel}.',
+    channel: {
+      email: 'correo electrónico',
+      sms: 'teléfono',
+    },
+    useCode: 'Enviarme un código',
+    sendCode: 'Enviar código',
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+    failed: 'No se pudo confirmar que eres tú. Inténtalo de nuevo.',
+  },
+  planLimit: {
+    title: 'Límite del plan alcanzado',
+    jobs: 'Tu plan permite hasta {count} trabajos abiertos.',
+    seats: 'Tu plan permite hasta {count} miembros.',
+    manager: 'Mejora el plan para agregar más, o completa o cancela trabajos abiertos.',
+    member: 'Pide al propietario del espacio o a un administrador que mejore el plan.',
+    notNow: 'Ahora no',
+    seePlans: 'Ver planes',
+    ok: 'Ok',
+  },
+}
+export default team

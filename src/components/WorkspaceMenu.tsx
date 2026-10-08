@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom'
 import { Card } from './Card'
 import { DialogShell } from './DialogShell'
 import { JoinWithCode } from './JoinWithCode'
+import { OwnershipOfferBanner } from './OwnershipOfferBanner'
 import { useCurrentWorkspace } from '../lib/workspace'
+import { WORKSPACE_MENU_TRIGGER_ID } from '../lib/workspaceMenu'
 import { useTranslation } from '../hooks/useTranslation'
 
 // Which workspace the office is working in. Everything on screen — jobs,
@@ -25,6 +27,7 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
       }}
     >
       <button
+        id={WORKSPACE_MENU_TRIGGER_ID}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -36,7 +39,8 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
         <CaretDown size={14} aria-hidden="true" className="shrink-0 text-ink-subtle" />
       </button>
       {open && (
-        <div role="menu" className="card absolute top-full right-0 z-40 mt-1 w-60 p-1">
+        <div role="menu" className="card absolute top-full right-0 z-40 mt-1 w-72 p-1">
+          <OwnershipOfferBanner className="p-1" onReview={() => setOpen(false)} />
           {workspaces.map((w) => (
             <button
               key={w.id}

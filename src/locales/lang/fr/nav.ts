@@ -28,6 +28,7 @@ const nav: typeof enNav = {
     links: {
       dashboard: 'Tableau de bord',
       billing: 'Facturation',
+      organization: 'Organisation',
       settings: 'Paramètres',
     },
     language: 'Langue',

@@ -28,6 +28,10 @@ const Settings = lazy(() => import('./pages/Settings'))
 
 const Home = lazy(() => import('./pages/Home'))
 const CreateWorkspace = lazy(() => import('./pages/CreateWorkspace'))
+// The Organization area (docs/parity/*.md): team, roles, business, activity
+const OrganizationLayout = lazy(() => import('./pages/organization/OrganizationLayout'))
+const Members = lazy(() => import('./pages/organization/Members'))
+const InviteMember = lazy(() => import('./pages/organization/InviteMember'))
 
 function AppToaster() {
   const { theme } = useTheme()
@@ -61,6 +65,11 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/billing/success" element={<CheckoutRedirect status="success" />} />
                 <Route path="/billing/cancelled" element={<CheckoutRedirect status="cancelled" />} />
                 <Route path="/workspaces/new" element={<Suspense fallback={null}><CreateWorkspace /></Suspense>} />
+                <Route path="/organization" element={<Suspense fallback={null}><OrganizationLayout /></Suspense>}>
+                  <Route index element={<Navigate to="/organization/members" replace />} />
+                  <Route path="members" element={<Suspense fallback={null}><Members /></Suspense>} />
+                  <Route path="members/invite" element={<Suspense fallback={null}><InviteMember /></Suspense>} />
+                </Route>
               </Route>
             </Route>
             <Route element={<GuestOnly />}>

@@ -9,6 +9,7 @@
 		"lint": "oxlint",
 		"typecheck": "tsc -b --noEmit",
 		"preview": "vite preview",
+		"test": "vitest run",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
 		"check:brand": "node scripts/check-brand.mjs"
@@ -41,6 +42,7 @@
 		"oxlint": "^1.79.0",
 		"tailwindcss": "^4.3.3",
 		"typescript": "~6.0.2",
-		"vite": "^8.2.2"
+		"vite": "^8.2.2",
+		"vitest": "^5.0.3"
 	}
 }

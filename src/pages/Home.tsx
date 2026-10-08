@@ -1,7 +1,9 @@
 import { useSubscription } from '@fonderie/react-billing'
 import { CreditCard, GearSix } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
+import { ArchivedWorkspaceBanner } from '../components/ArchivedWorkspaceBanner'
 import { Card } from '../components/Card'
+import { OwnershipOfferBanner } from '../components/OwnershipOfferBanner'
 import { useTranslation } from '../hooks/useTranslation'
 import { planLabel } from '../lib/billing'
 import { useAppSession, userDisplayName } from '../lib/session'
@@ -19,6 +21,8 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <h1 className="text-headline text-ink">{t('home.title', { name: userDisplayName(user) })}</h1>
+      <OwnershipOfferBanner />
+      <ArchivedWorkspaceBanner />
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="p-6">
           <p className="text-sm text-ink-subtle">{t('home.workspace')}</p>
