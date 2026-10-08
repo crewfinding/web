@@ -1,4 +1,4 @@
-import { CreditCard, ShieldCheck, UsersThree } from '@phosphor-icons/react'
+import { Buildings, CreditCard, ShieldCheck, UsersThree } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -7,7 +7,7 @@ import { cn } from '../../lib/cn'
 import { useCurrentWorkspace } from '../../lib/workspace'
 
 // The Organization area — the mobile app's Organization screen as a section
-// nav: Team Members (and later Business Info, Roles…) and Billing. A personal
+// nav: Business Info, Team Members, Roles & Permissions and Billing. A personal
 // workspace has no team: its team links are not offered (their pages still
 // answer with the personal-workspace explanation).
 interface ISection {
@@ -19,6 +19,7 @@ interface ISection {
 }
 
 const SECTIONS: ISection[] = [
+  { to: '/organization/business', label: 'org.nav.info', icon: Buildings },
   { to: '/organization/members', label: 'org.nav.members', icon: UsersThree, team: true },
   { to: '/organization/roles', label: 'org.nav.roles', icon: ShieldCheck, team: true },
   { to: '/billing', label: 'org.nav.billing', icon: CreditCard },

@@ -9,8 +9,9 @@ import errors from './errors'
 import org from './org'
 import team from './team'
 import roles from './roles'
+import business from './business'
 
 // Each domain file is typed against its English counterpart, so this
 // aggregate matches the canonical shape by construction.
-const es = { common, nav, auth, home, billing, settings, invite, errors, org, team, roles }
+const es = { common, nav, auth, home, billing, settings, invite, errors, org, team, roles, business }
 export default es

@@ -1,5 +1,5 @@
 import { Eye, EyeSlash, type Icon } from '@phosphor-icons/react'
-import { forwardRef, useCallback, useState } from 'react'
+import { forwardRef, useCallback, useId, useState } from 'react'
 import type { ChangeEvent, InputHTMLAttributes } from 'react'
 import { useTranslation } from '../hooks/useTranslation'
 import { cn } from '../lib/cn'
@@ -77,8 +77,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const hasError = !!error
     const hasWarning = !!warning && !hasError
+    // A label always names its field: an id of our own when the caller gave none.
+    const autoId = useId()
+    const id = props.id ?? autoId
     const message = error || warning || helperText
-    const messageId = props.id && message ? `${props.id}-message` : undefined
+    const messageId = message ? `${id}-message` : undefined
 
     const stateClasses = hasError
       ? 'border-error focus:border-error focus:ring-error/20'
@@ -89,7 +92,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn('w-full', containerClassName)}>
         {label && (
-          <label htmlFor={props.id} className="mb-1.5 block text-sm font-medium text-ink">
+          <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
             {label}
           </label>
         )}
@@ -121,6 +124,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={hasError}
             aria-describedby={messageId}
             {...props}
+            id={id}
           />
 
           {isPassword && (
