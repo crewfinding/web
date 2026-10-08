@@ -8,8 +8,9 @@ import settings from './settings'
 import errors from './errors'
 import org from './org'
 import team from './team'
+import roles from './roles'
 
 // Each domain file is typed against its English counterpart, so this
 // aggregate matches the canonical shape by construction.
-const fr = { common, nav, auth, home, billing, settings, invite, errors, org, team }
+const fr = { common, nav, auth, home, billing, settings, invite, errors, org, team, roles }
 export default fr

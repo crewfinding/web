@@ -32,6 +32,9 @@ const CreateWorkspace = lazy(() => import('./pages/CreateWorkspace'))
 const OrganizationLayout = lazy(() => import('./pages/organization/OrganizationLayout'))
 const Members = lazy(() => import('./pages/organization/Members'))
 const InviteMember = lazy(() => import('./pages/organization/InviteMember'))
+const Roles = lazy(() => import('./pages/organization/Roles'))
+const RoleDetail = lazy(() => import('./pages/organization/RoleDetail'))
+const CreateRole = lazy(() => import('./pages/organization/CreateRole'))
 
 function AppToaster() {
   const { theme } = useTheme()
@@ -69,6 +72,9 @@ createRoot(document.getElementById('root')!).render(
                   <Route index element={<Navigate to="/organization/members" replace />} />
                   <Route path="members" element={<Suspense fallback={null}><Members /></Suspense>} />
                   <Route path="members/invite" element={<Suspense fallback={null}><InviteMember /></Suspense>} />
+                  <Route path="roles" element={<Suspense fallback={null}><Roles /></Suspense>} />
+                  <Route path="roles/new" element={<Suspense fallback={null}><CreateRole /></Suspense>} />
+                  <Route path="roles/:roleId" element={<Suspense fallback={null}><RoleDetail /></Suspense>} />
                 </Route>
               </Route>
             </Route>

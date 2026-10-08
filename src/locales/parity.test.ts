@@ -15,7 +15,7 @@ const leaves = (node: unknown, path = ''): [string, string][] =>
       : Object.entries(node as Record<string, unknown>).flatMap(([k, v]) => leaves(v, path ? `${path}.${k}` : k))
 
 const params = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
-const WORKSPACE_AREAS = ['team', 'org', 'errors'] as const
+const WORKSPACE_AREAS = ['team', 'org', 'errors', 'roles'] as const
 
 describe('locale parity', () => {
   const enLeaves = new Map(leaves(en))

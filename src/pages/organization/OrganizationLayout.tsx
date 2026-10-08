@@ -1,4 +1,4 @@
-import { CreditCard, UsersThree } from '@phosphor-icons/react'
+import { CreditCard, ShieldCheck, UsersThree } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from '../../hooks/useTranslation'
@@ -20,6 +20,7 @@ interface ISection {
 
 const SECTIONS: ISection[] = [
   { to: '/organization/members', label: 'org.nav.members', icon: UsersThree, team: true },
+  { to: '/organization/roles', label: 'org.nav.roles', icon: ShieldCheck, team: true },
   { to: '/billing', label: 'org.nav.billing', icon: CreditCard },
 ]
 
