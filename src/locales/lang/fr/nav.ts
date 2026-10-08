@@ -6,7 +6,7 @@ const nav: typeof enNav = {
     label: 'Espace de travail : {name}',
     personal: 'Espace personnel',
     create: 'Nouvel espace de travail',
-    none: "Vous n'avez pas encore d'espace de travail.",
+    none: "Vous n’avez pas encore d’espace de travail.",
   },
   language: 'Langue : {name}',
   theme: {

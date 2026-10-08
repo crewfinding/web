@@ -91,7 +91,7 @@ const settings: typeof enSettings = {
     connect: 'Vincular',
     disconnect: 'Desvincular',
     disconnectFailed: 'No se pudo desvincular esa cuenta',
-    disconnected: '{provider} se ha desvinculado',
+    disconnected: '{provider} se desvinculó',
   },
   security: {
     title: 'Seguridad',
@@ -118,15 +118,15 @@ const settings: typeof enSettings = {
       invalidCode: 'Código no válido',
       qrAlt: 'Código QR para tu aplicación de autenticación',
       scan: 'Escanea con tu aplicación de autenticación',
-      scanHint: 'Luego introduce el código de 6 dígitos que muestra para terminar la activación.',
+      scanHint: 'Luego ingresa el código de 6 dígitos que muestra para terminar la activación.',
       enable: 'Activar',
       cancel: 'Cancelar',
       backupCodesEnroll:
         'Códigos de respaldo — guárdalos en un lugar seguro, solo se muestran una vez.',
       disablePrompt:
-        'Introduce un código de tu aplicación de autenticación para desactivar la autenticación de dos factores',
+        'Ingresa un código de tu aplicación de autenticación para desactivar la autenticación de dos factores',
       regeneratePrompt:
-        'Introduce un código de tu aplicación de autenticación para generar nuevos códigos de respaldo',
+        'Ingresa un código de tu aplicación de autenticación para generar nuevos códigos de respaldo',
       disable: 'Desactivar',
       generateCodes: 'Generar códigos',
       backupCodesFresh:
@@ -179,7 +179,7 @@ const settings: typeof enSettings = {
     loadFailed: 'No se pudieron cargar las sesiones.',
     loading: 'Cargando…',
     empty: 'No hay sesiones activas.',
-    othersTerminated: 'Las demás sesiones se han cerrado',
+    othersTerminated: 'Las demás sesiones se cerraron',
     terminated: 'Sesión cerrada',
     terminateFailed: 'No se pudo cerrar la sesión',
     confirmOthersTitle: '¿Cerrar todas las demás sesiones?',
@@ -195,7 +195,7 @@ const settings: typeof enSettings = {
     delete: 'Eliminar cuenta',
     confirmTitle: '¿Eliminar la cuenta?',
     confirmDescription: 'Tu cuenta se elimina de forma permanente, con todo lo de tu espacio personal. No se puede deshacer.',
-    deleted: 'Tu cuenta ha sido eliminada',
+    deleted: 'Se eliminó tu cuenta',
     deleteFailed: 'No se pudo eliminar tu cuenta',
   },
   device: {

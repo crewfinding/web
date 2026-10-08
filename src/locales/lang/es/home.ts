@@ -5,7 +5,7 @@ const home: typeof enHome = {
   workspace: 'Espacio de trabajo',
   plan: 'Plan',
   manageBilling: 'Facturación y plan',
-  settings: 'Ajustes de la cuenta',
+  settings: 'Configuración de la cuenta',
   newWorkspace: {
     title: 'Nuevo espacio de trabajo',
     description: 'Un espacio de trabajo tiene sus propios trabajos, clientes, equipo y plan.',

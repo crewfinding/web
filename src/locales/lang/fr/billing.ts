@@ -21,13 +21,13 @@ const billing: typeof enBilling = {
       text: "Supprimer la carte",
     },
     "start-trial": {
-      text: "Commencer l'essai gratuit",
+      text: "Commencer l’essai gratuit",
     },
     "subscribe-no-trial": {
-      text: "S'abonner sans essai",
+      text: "S’abonner sans essai",
     },
     subscribe: {
-      text: "S'abonner",
+      text: "S’abonner",
     },
     "update-card": {
       text: "Mettre à jour la carte",
@@ -36,7 +36,7 @@ const billing: typeof enBilling = {
       text: "Mettre à niveau",
     },
     "verify-email": {
-      text: "Vérifier l'e-mail",
+      text: "Vérifier l’adresse courriel",
     },
   },
   "canceled-notice": {
@@ -45,15 +45,15 @@ const billing: typeof enBilling = {
   card: {
     // The card form (Stripe Payment Element, card only).
     cancel: 'Annuler',
-    noPaymentMethod: "La confirmation de la carte n'a pas renvoyé de moyen de paiement.",
+    noPaymentMethod: "La confirmation de la carte n’a pas renvoyé de moyen de paiement.",
     preparing: 'Préparation du formulaire de carte sécurisé…',
     save: 'Enregistrer la carte',
-    saveFailed: "Impossible d'enregistrer la carte.",
-    saveRetry: "Impossible d'enregistrer la carte. Veuillez réessayer.",
+    saveFailed: "Impossible d’enregistrer la carte.",
+    saveRetry: "Impossible d’enregistrer la carte. Veuillez réessayer.",
     saved: 'Carte enregistrée',
     saving: 'Enregistrement…',
-    setupFailed: "Impossible de démarrer l'ajout de carte. Veuillez réessayer.",
-    unavailableAfter: "pour l'activer.",
+    setupFailed: "Impossible de démarrer l’ajout de carte. Veuillez réessayer.",
+    unavailableAfter: "pour l’activer.",
     unavailableBefore: 'La saisie de carte intégrée est indisponible — définissez',
     current: {
       title: "Forfait actuel",
@@ -74,14 +74,14 @@ const billing: typeof enBilling = {
     },
   },
   "checkout-cancelled": {
-    text: "Paiement fermé. Rien n'a été facturé.",
+    text: "Paiement fermé. Rien n’a été facturé.",
   },
   "checkout-success": {
     text: "Paiement reçu — votre forfait sera mis à jour dans un instant.",
   },
   checkout: {
-    past_due: "Votre forfait présente un solde impayé. Mettez d'abord à jour votre paiement.",
-    plan_change_requires_cancel: "Pour passer à ce forfait, annulez d'abord votre forfait actuel — vous le gardez jusqu'à la fin de la période, puis abonnez-vous au nouveau.",
+    past_due: "Votre forfait présente un solde impayé. Mettez d’abord à jour votre paiement.",
+    plan_change_requires_cancel: "Pour passer à ce forfait, annulez d’abord votre forfait actuel — vous le gardez jusqu’à la fin de la période, puis abonnez-vous au nouveau.",
     plan_unchanged: "Vous avez déjà ce forfait.",
     scheduled_to_cancel: "Votre forfait doit se terminer. Conservez-le avant de changer de forfait.",
   },
@@ -92,15 +92,15 @@ const billing: typeof enBilling = {
     keep: {
       text: "Conserver le forfait",
     },
-    text: "Votre espace conserve {plan} jusqu'au {date}, puis passe au forfait gratuit. Vous pouvez vous réabonner à tout moment.",
+    text: "Votre espace conserve {plan} jusqu’au {date}, puis passe au forfait gratuit. Vous pouvez vous réabonner à tout moment.",
     title: "Annuler {plan} ?",
   },
   "confirm-remove": {
-    text: "Les renouvellements échoueront tant qu'aucune autre carte n'est ajoutée.",
+    text: "Les renouvellements échoueront tant qu’aucune autre carte n’est ajoutée.",
     title: "Supprimer cette carte ?",
   },
   "confirm-upgrade": {
-    text: "Le changement s'applique immédiatement. La différence au prorata pour le reste de la période vous sera facturée.",
+    text: "Le changement s’applique immédiatement. La différence au prorata pour le reste de la période vous sera facturée.",
     title: "Passer au forfait {plan} ?",
   },
   current: {
@@ -130,7 +130,7 @@ const billing: typeof enBilling = {
     text: "Facturation & paiement",
   },
   incomplete: {
-    text: "Le paiement n'a pas été finalisé — aucun forfait n'est actif.",
+    text: "Le paiement n’a pas été finalisé — aucun forfait n’est actif.",
   },
   interval: {
     month: {
@@ -149,7 +149,7 @@ const billing: typeof enBilling = {
   invoices: {
     more: "Afficher les factures plus anciennes",
     empty: "Aucune facture pour le moment.",
-    "no-link": "Cette facture n'a pas encore de document.",
+    "no-link": "Cette facture n’a pas encore de document.",
     status: {
       draft: "Brouillon",
       open: "Ouverte",
@@ -164,17 +164,17 @@ const billing: typeof enBilling = {
       text: "{count} appels API par jour",
     },
     jobs: {
-      text: "Jusqu'à {count} travaux ouverts",
+      text: "Jusqu’à {count} travaux ouverts",
     },
   },
   loading: {
     text: "Chargement…",
   },
   "manager-required": {
-    text: "Seul le propriétaire de l'espace ou un administrateur peut modifier la facturation.",
+    text: "Seul le propriétaire de l’espace ou un administrateur peut modifier la facturation.",
   },
   "members-readonly": {
-    text: "Seul le propriétaire de l'espace ou un administrateur peut modifier la facturation.",
+    text: "Seul le propriétaire de l’espace ou un administrateur peut modifier la facturation.",
   },
   "not-now": {
     text: "Plus tard",
@@ -190,19 +190,19 @@ const billing: typeof enBilling = {
   },
   "plan-limit": {
     jobs: {
-      text: "Votre forfait permet jusqu'à {count} travaux ouverts.",
+      text: "Votre forfait permet jusqu’à {count} travaux ouverts.",
     },
     manager: {
       text: "Passez à un forfait supérieur pour en ajouter, ou terminez ou annulez des travaux ouverts.",
     },
     member: {
-      text: "Demandez au propriétaire de l'espace ou à un administrateur de changer de forfait.",
+      text: "Demandez au propriétaire de l’espace ou à un administrateur de changer de forfait.",
     },
     "not-now": {
       text: "Plus tard",
     },
     seats: {
-      text: "Votre forfait permet jusqu'à {count} membres.",
+      text: "Votre forfait permet jusqu’à {count} membres.",
     },
     "see-plans": {
       text: "Voir les forfaits",
@@ -232,8 +232,8 @@ const billing: typeof enBilling = {
     text: "Renouvellement",
   },
   seats: {
-    one: "Jusqu'à 1 membre",
-    text: "Jusqu'à {count} membres",
+    one: "Jusqu’à 1 membre",
+    text: "Jusqu’à {count} membres",
   },
   status: {
     active: "Actif",
@@ -242,25 +242,25 @@ const billing: typeof enBilling = {
     incomplete: "Incomplet",
     past_due: "Paiement en retard",
     paused: "Suspendu",
-    trialing: "Période d'essai",
+    trialing: "Période d’essai",
     unpaid: "Impayé",
   },
   "trial-ends-on": {
-    text: "Fin de l'essai le {date}",
+    text: "Fin de l’essai le {date}",
   },
   "trial-ends": {
     text: "Essai se termine",
   },
   "trial-gate-unavailable": {
-    text: "Impossible de vérifier l'admissibilité à l'essai pour le moment. Réessayez dans un instant.",
+    text: "Impossible de vérifier l’admissibilité à l’essai pour le moment. Réessayez dans un instant.",
   },
   "trial-unavailable": {
-    text: "Aucun essai gratuit n'est disponible pour ce compte. Vous pouvez tout de même vous abonner maintenant — la facturation commence aujourd'hui.",
+    text: "Aucun essai gratuit n’est disponible pour ce compte. Vous pouvez tout de même vous abonner maintenant — la facturation commence aujourd’hui.",
     title: "Aucun essai gratuit disponible",
   },
   "trial-verify": {
-    text: "Vérifiez votre adresse e-mail pour commencer un essai gratuit. Nous allons vous envoyer un code.",
-    title: "Vérifiez votre e-mail",
+    text: "Vérifiez votre adresse courriel pour commencer un essai gratuit. Nous allons vous envoyer un code.",
+    title: "Vérifiez votre adresse courriel",
   },
   trial: {
     text: "Essai gratuit de {days} jours sur le premier forfait de votre espace",

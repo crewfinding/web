@@ -9,9 +9,9 @@ const home: typeof enHome = {
   newWorkspace: {
     title: 'Nouvel espace de travail',
     description: 'Un espace de travail a ses propres travaux, clients, équipe et forfait.',
-    name: "Nom de l'espace de travail",
-    nameRequired: "Donnez un nom à l'espace de travail.",
-    create: "Créer l'espace de travail",
+    name: "Nom de l’espace de travail",
+    nameRequired: "Donnez un nom à l’espace de travail.",
+    create: "Créer l’espace de travail",
     cancel: 'Annuler',
     created: 'Espace de travail créé',
   },

@@ -3,7 +3,7 @@ import type enBilling from '../en/billing'
 const billing: typeof enBilling = {
   btn: {
     "add-card": {
-      text: "Añadir tarjeta",
+      text: "Agregar tarjeta",
     },
     cancel: {
       text: "Cancelar plan",
@@ -74,7 +74,7 @@ const billing: typeof enBilling = {
     },
   },
   "checkout-cancelled": {
-    text: "Pago cerrado. No se ha cobrado nada.",
+    text: "Pago cerrado. No se cobró nada.",
   },
   "checkout-success": {
     text: "Pago recibido — tu plan se actualizará en un momento.",
@@ -96,7 +96,7 @@ const billing: typeof enBilling = {
     title: "¿Cancelar {plan}?",
   },
   "confirm-remove": {
-    text: "Las renovaciones fallarán hasta que se añada otra tarjeta.",
+    text: "Las renovaciones fallarán hasta que se agregue otra tarjeta.",
     title: "¿Eliminar esta tarjeta?",
   },
   "confirm-upgrade": {
@@ -193,7 +193,7 @@ const billing: typeof enBilling = {
       text: "Tu plan permite hasta {count} trabajos abiertos.",
     },
     manager: {
-      text: "Mejora el plan para añadir más, o completa o cancela trabajos abiertos.",
+      text: "Mejora el plan para agregar más, o completa o cancela trabajos abiertos.",
     },
     member: {
       text: "Pide al propietario del espacio o a un administrador que mejore el plan.",
@@ -220,7 +220,7 @@ const billing: typeof enBilling = {
     "per-year": "{price} / año",
   },
   "reactivate-failed": {
-    text: "Este plan ya ha terminado. Elige un plan abajo para volver a suscribirte.",
+    text: "Este plan ya terminó. Elige un plan abajo para volver a suscribirte.",
   },
   "reactivated-notice": {
     text: "Tu plan se renovará como de costumbre.",

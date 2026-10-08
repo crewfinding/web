@@ -5,7 +5,7 @@ const common: typeof enCommon = {
   loading: 'Chargement...',
   notFound: {
     title: 'Page introuvable',
-    description: "La page que vous recherchez n'existe pas ou a été déplacée.",
+    description: "La page que vous recherchez n’existe pas ou a été déplacée.",
     backToDashboard: 'Retour au tableau de bord',
   },
   dialog: {
