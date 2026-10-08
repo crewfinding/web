@@ -36,6 +36,17 @@ function remember(id: string): void {
   }
 }
 
+/**
+ * Open the app on this workspace — after joining one, for instance. Callable
+ * outside <WorkspaceProvider> (the invitation pages sit outside it): the
+ * provider keeps the selection as long as its list holds the id, so refresh
+ * the workspace list BEFORE calling this.
+ */
+export function switchToWorkspace(id: string): void {
+  remember(id)
+  fonderie.setWorkspaceId(id)
+}
+
 /** The one to open on: the last one used here, else the personal one, else the first. */
 export function pickWorkspace(list: IWorkspaceDTO[], last: string | null): IWorkspaceDTO | null {
   return list.find((w) => w.id === last) ?? list.find((w) => w.type === 'PERSONAL') ?? list[0] ?? null
@@ -54,10 +65,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     if (next) fonderie.setWorkspaceId(next.id)
   }, [isLoading, workspaces, currentId])
 
-  const select = useCallback((id: string) => {
-    remember(id)
-    fonderie.setWorkspaceId(id)
-  }, [])
+  const select = useCallback((id: string) => switchToWorkspace(id), [])
 
   const current = workspaces.find((w) => w.id === currentId) ?? null
   return (

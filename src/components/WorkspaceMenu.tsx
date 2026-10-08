@@ -1,6 +1,9 @@
-import { CaretDown, Check, Plus } from '@phosphor-icons/react'
+import { CaretDown, Check, Plus, UserPlus } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Card } from './Card'
+import { DialogShell } from './DialogShell'
+import { JoinWithCode } from './JoinWithCode'
 import { useCurrentWorkspace } from '../lib/workspace'
 import { useTranslation } from '../hooks/useTranslation'
 
@@ -10,6 +13,7 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
   const { t } = useTranslation()
   const { workspaces, current, select } = useCurrentWorkspace()
   const [open, setOpen] = useState(false)
+  const [joining, setJoining] = useState(false)
   if (!current) return null
   const nameOf = (w: { name: string; type: string }) => (w.type === 'PERSONAL' ? t('nav.workspace.personal') : w.name)
 
@@ -58,8 +62,29 @@ export default function WorkspaceMenu({ className = '' }: { className?: string }
             <Plus size={14} aria-hidden="true" className="w-4 shrink-0" />
             {t('nav.workspace.create')}
           </Link>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false)
+              setJoining(true)
+            }}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm text-link hover:bg-surface-2"
+          >
+            <UserPlus size={14} aria-hidden="true" className="w-4 shrink-0" />
+            {t('invite.title')}
+          </button>
         </div>
       )}
+      <DialogShell open={joining} labelledBy="join-dialog-title" onClose={() => setJoining(false)}>
+        <Card className="p-6">
+          <h2 id="join-dialog-title" className="text-card-title text-ink">
+            {t('invite.title')}
+          </h2>
+          <p className="mt-2 mb-4 text-sm text-ink-subtle">{t('invite.body')}</p>
+          <JoinWithCode onCancel={() => setJoining(false)} />
+        </Card>
+      </DialogShell>
     </div>
   )
 }

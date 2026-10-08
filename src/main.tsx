@@ -14,6 +14,7 @@ import AppLayout from './layouts/AppLayout'
 import AuthLayout from './layouts/AuthLayout'
 import Billing from './pages/Billing'
 import ForgotPassword from './pages/ForgotPassword'
+import Join from './pages/Join'
 import AuthCallback from './pages/AuthCallback'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
@@ -74,6 +75,9 @@ createRoot(document.getElementById('root')!).render(
                 requires a session to verify, and the screen surfaces that */}
             <Route element={<AuthLayout />}>
               <Route path="/verify" element={<VerifyEmail />} />
+              {/* Joining a team: signed out it asks to sign in or sign up
+                  and comes back; signed in it redeems the email's code */}
+              <Route path="/join" element={<Join />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

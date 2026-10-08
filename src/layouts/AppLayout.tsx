@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
+import { Button } from '../components/Button'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import { useViewport } from '../hooks/useViewport'
@@ -61,7 +62,14 @@ function WorkspaceGate({ children }: { children: React.ReactNode }) {
   const { current, isLoading, workspaces } = useCurrentWorkspace()
   if (current) return <>{children}</>
   if (!isLoading && workspaces.length === 0) {
-    return <p className="text-sm text-ink-subtle">{t('nav.workspace.none')}</p>
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-sm text-ink-subtle">{t('nav.workspace.none')}</p>
+        <Button asChild>
+          <Link to="/join">{t('invite.title')}</Link>
+        </Button>
+      </div>
+    )
   }
   return <p className="text-sm text-ink-subtle" role="status">{t('common.loading')}</p>
 }

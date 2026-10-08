@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { peekReturnTo } from '../lib/returnTo'
 import { useAppSession } from '../lib/session'
 
 // Route-level guards: wrap a layout route group, gate via Outlet.
@@ -10,7 +11,12 @@ export function RequireAuth() {
   const { isAuthenticated, isLoading } = useAppSession()
   const location = useLocation()
   if (isLoading) return null
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace state={{ from: location }} />
+  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location }} />
+  // Signed in after leaving an invitation page to do so (sign-up, Google,
+  // Apple all land on home): back to it. That page clears the detour.
+  const returnTo = peekReturnTo()
+  if (returnTo && returnTo !== location.pathname) return <Navigate to={returnTo} replace />
+  return <Outlet />
 }
 
 export function GuestOnly() {
