@@ -33,6 +33,21 @@ const OrganizationLayout = lazy(() => import('./pages/organization/OrganizationL
 const Members = lazy(() => import('./pages/organization/Members'))
 const InviteMember = lazy(() => import('./pages/organization/InviteMember'))
 const Business = lazy(() => import('./pages/organization/Business'))
+// Business info's pages, one per hub row (docs/ux/BUSINESS-SCREEN.md of the mobile app)
+const ProfilePages = () => import('./pages/organization/business/ProfilePages')
+const ContactPages = () => import('./pages/organization/business/ContactPages')
+const LocationPages = () => import('./pages/organization/business/LocationPages')
+const TaxesPage = () => import('./pages/organization/business/TaxesPage')
+const SettingsPages = () => import('./pages/organization/business/SettingsPages')
+const BusinessProfile = lazy(() => ProfilePages().then((m) => ({ default: m.BusinessProfilePage })))
+const BusinessLegal = lazy(() => ProfilePages().then((m) => ({ default: m.BusinessLegalPage })))
+const BusinessEmails = lazy(() => ContactPages().then((m) => ({ default: m.BusinessEmailsPage })))
+const BusinessPhones = lazy(() => ContactPages().then((m) => ({ default: m.BusinessPhonesPage })))
+const BusinessLocations = lazy(() => LocationPages().then((m) => ({ default: m.BusinessLocationsPage })))
+const BusinessLocation = lazy(() => LocationPages().then((m) => ({ default: m.BusinessLocationPage })))
+const BusinessTaxes = lazy(() => TaxesPage().then((m) => ({ default: m.BusinessTaxesPage })))
+const BusinessNumbers = lazy(() => SettingsPages().then((m) => ({ default: m.BusinessNumbersPage })))
+const BusinessRegional = lazy(() => SettingsPages().then((m) => ({ default: m.BusinessRegionalPage })))
 const Activity = lazy(() => import('./pages/organization/Activity'))
 const Roles = lazy(() => import('./pages/organization/Roles'))
 const RoleDetail = lazy(() => import('./pages/organization/RoleDetail'))
@@ -73,6 +88,16 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/organization" element={<Suspense fallback={null}><OrganizationLayout /></Suspense>}>
                   <Route index element={<Navigate to="/organization/business" replace />} />
                   <Route path="business" element={<Suspense fallback={null}><Business /></Suspense>} />
+                  <Route path="business/profile" element={<Suspense fallback={null}><BusinessProfile /></Suspense>} />
+                  <Route path="business/legal" element={<Suspense fallback={null}><BusinessLegal /></Suspense>} />
+                  <Route path="business/emails" element={<Suspense fallback={null}><BusinessEmails /></Suspense>} />
+                  <Route path="business/phones" element={<Suspense fallback={null}><BusinessPhones /></Suspense>} />
+                  <Route path="business/locations" element={<Suspense fallback={null}><BusinessLocations /></Suspense>} />
+                  <Route path="business/locations/new" element={<Suspense fallback={null}><BusinessLocation /></Suspense>} />
+                  <Route path="business/locations/:locationId" element={<Suspense fallback={null}><BusinessLocation /></Suspense>} />
+                  <Route path="business/taxes" element={<Suspense fallback={null}><BusinessTaxes /></Suspense>} />
+                  <Route path="business/numbers" element={<Suspense fallback={null}><BusinessNumbers /></Suspense>} />
+                  <Route path="business/regional" element={<Suspense fallback={null}><BusinessRegional /></Suspense>} />
                   <Route path="members" element={<Suspense fallback={null}><Members /></Suspense>} />
                   <Route path="members/invite" element={<Suspense fallback={null}><InviteMember /></Suspense>} />
                   <Route path="activity" element={<Suspense fallback={null}><Activity /></Suspense>} />

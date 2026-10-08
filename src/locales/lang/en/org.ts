@@ -2,7 +2,21 @@
 // the archive card (docs/parity/*.md). Copied from the mobile app.
 const org = {
   title: 'Organization',
-  intro: 'Manage your organization details, team, and billing.',
+  // The Organization hub's groups (the mobile app's cards): a title and a one-line description each.
+  groups: {
+    business: {
+      title: 'Business Details',
+      description: 'Your business profile, contact details, taxes and documents.',
+    },
+    team: {
+      title: 'Team',
+      description: 'Invite people, and manage roles and what each person can do.',
+    },
+    billing: {
+      title: 'Billing',
+      description: 'Your plan, payment method and invoices.',
+    },
+  },
   nav: {
     label: 'Organization sections',
     info: 'Business Info',

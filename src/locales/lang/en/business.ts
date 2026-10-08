@@ -1,4 +1,4 @@
-// Business info: the six cards (docs/parity/3-business.md). Copied from the mobile app.
+// Business info: a hub of grouped rows, one page each (docs/ux/BUSINESS-SCREEN.md of the mobile app). Copied from the mobile app.
 const business = {
   title: 'Business',
   intro: 'Your business details appear on quotes, invoices and messages to customers.',
@@ -15,6 +15,49 @@ const business = {
   cancel: 'Cancel',
   more: 'More actions',
   empty: "Can't be blank",
+  // The hub (docs/ux/BUSINESS-SCREEN.md): groups, rows, each page's paragraph.
+  group: {
+    business: {
+      title: 'Business',
+      description: 'How your business appears on quotes, invoices and messages.',
+    },
+    contact: {
+      title: 'Contact',
+      description: 'How customers and your team reach you.',
+    },
+    documents: {
+      title: 'Taxes & documents',
+      description: 'The taxes you charge and how your documents are numbered.',
+    },
+    preferences: {
+      title: 'Preferences',
+      description: 'Language, time zone and currency for your documents.',
+    },
+  },
+  option: {
+    profile: 'Business profile',
+    legal: 'Legal details',
+    emails: 'Emails',
+    phones: 'Phone numbers',
+    locations: 'Locations',
+    taxes: 'Taxes',
+    numbers: 'Document numbers',
+    regional: 'Regional settings',
+  },
+  paragraph: {
+    profile: 'Your logo, name, slogan, sector and website, as customers see them.',
+    legal: 'The legal name, legal form and business number on your invoices.',
+    emails: 'The primary email is shown on your documents. Add others for billing or dispatch.',
+    phones: 'The primary number is shown on your documents. Add others for the office or dispatch.',
+    locations: 'Your head office sets your taxes and time zone. Add your other offices and shops.',
+    taxes: 'The taxes on your quotes and invoices, with your registration numbers.',
+    numbers: 'How your invoices, quotes and jobs are numbered.',
+    regional: 'The language, time zone and currency of your documents.',
+  },
+  footer: {
+    save: 'Save changes',
+    discard: 'Discard changes',
+  },
   logo: {
     a11y: 'Business logo',
     add: 'Add a logo',
@@ -22,14 +65,11 @@ const business = {
     uploading: 'Uploading the logo…',
     prepareError: 'This picture could not be prepared. Try another one.',
     delete: 'Delete',
-    deleteA11y: 'Delete the logo',
   },
   profile: {
-    title: 'Profile',
     name: 'Business name',
     slogan: 'Slogan',
     sector: 'Sector',
-    legal: 'Legal details',
     legalName: 'Legal name (if different)',
     type: 'Legal form',
   },
@@ -63,7 +103,7 @@ const business = {
     other: 'Other',
   },
   contact: {
-    title: 'Contact',
+    primaryBadge: 'Primary',
     emails: 'Emails',
     phones: 'Phone numbers',
     emailEmpty: 'No email yet.',
@@ -75,9 +115,7 @@ const business = {
     labelPlaceholder: 'e.g. Billing, Dispatch',
     editLabel: 'Edit label',
     remove: 'Remove',
-    emailAddLabel: 'Another email',
     emailAdd: 'Add email',
-    phoneAddLabel: 'Another phone number',
     phoneAdd: 'Add phone number',
     emailError: 'Enter a valid email address',
     phoneError: 'Please enter a valid phone',
@@ -111,6 +149,8 @@ const business = {
     keep: 'Keep the current address',
     imprecise: 'Pick a more precise result — a street address, not a city or a region.',
     pick: 'Search for the address and pick it from the suggestions.',
+    editTitle: 'Edit location',
+    notFound: 'This location could not be found. It may have been removed.',
     maps: 'Open in Maps',
   },
   reason: {
@@ -122,13 +162,12 @@ const business = {
     LIMIT_REACHED: 'You have reached the limit for this list — remove one to add another.',
   },
   taxes: {
-    title: 'Taxes',
-    titleRegion: 'Taxes — {region}',
     needHeadOffice: 'Add your head office first — the taxes follow its province or state.',
     stored: 'Tax numbers',
     error: 'The tax rates could not be loaded.',
     rateHelp: 'Rate: {rate}',
-    custom: 'Different rates / add a tax',
+    basedOn: 'Based on your head office in {region}.',
+    customize: 'Customize rates',
     add: 'Add a tax number',
     remove: 'Remove this tax number',
     country: 'Country',
@@ -148,7 +187,6 @@ const business = {
     },
   },
   numbers: {
-    title: 'Document numbers',
     prefix: 'Prefix',
     placeholder: 'e.g. {example}',
     error: 'Up to 10 letters, digits or dashes',
@@ -160,7 +198,6 @@ const business = {
   },
   settingsUnavailable: 'These settings could not be loaded — they are left as they are.',
   regional: {
-    title: 'Regional settings',
     locale: 'Language of documents',
     timezone: 'Time zone',
     timezoneSuggested: 'From your head office: {zone}',
@@ -174,8 +211,8 @@ const business = {
   },
   address: {
     placeholder: 'Find a specific address on the map…',
-    detailsError: 'This address could not be loaded. Choose it again.',
-    searchError: 'Address search is unavailable right now — type the address instead.',
+    detailsError: "We couldn't load this address. Pick it again from the suggestions.",
+    searchError: "We couldn't load address suggestions. Check your connection and try again.",
   },
   phone: {
     placeholder: 'Enter a phone number',

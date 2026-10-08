@@ -1,4 +1,4 @@
-import type { IWorkspaceDTO, IWorkspaceLocationDTO } from '@fonderie/client'
+import type { IWorkspaceDTO } from '@fonderie/client'
 import { useWorkspaceProfile } from '@fonderie/react-workspaces'
 import { X } from '@phosphor-icons/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -22,12 +22,15 @@ import {
 } from '../../../lib/business'
 import { places, type ITaxPresets } from '../../../lib/places'
 import type { TranslationKey } from '../../../locales'
-import { CardError, Detail, Disclosure, LabeledSelect, SaveBar, SectionCard } from './parts'
+import { businessOption } from '../../../constants/businessMenu'
+import { CardError, Detail, Disclosure, FormFooter, LabeledSelect } from './parts'
+import { BusinessPage, type IBusinessContext } from './Shell'
 
-// Taxes follow the head office: its province / state decides which taxes
-// apply and their usual rates (GET /estimates/tax-presets), so the owner only
-// types each registration NUMBER. Different rates and extra registrations sit
-// behind "Different rates / add a tax" (the mobile app's TaxesCard).
+// The Taxes page. Taxes follow the head office: its province / state decides
+// which taxes apply and their usual rates (GET /estimates/tax-presets), so the
+// owner only types each registration NUMBER. Different rates and extra
+// registrations sit behind "Customize rates" (the mobile app's BusinessTaxes).
+// Sends { taxRegistrations } only, the BN / EIN carried over unchanged.
 
 type T = (key: TranslationKey, params?: Record<string, string | number>) => string
 
@@ -62,26 +65,15 @@ function useTaxPresetTables() {
   return { data, error, refresh }
 }
 
-export function TaxesCard({
-  workspace,
-  locations,
-  canEdit,
-}: {
-  workspace: IWorkspaceDTO
-  locations: IWorkspaceLocationDTO[]
-  canEdit: boolean
-}) {
+function Taxes({ workspace, locations, canEdit, write, back }: IBusinessContext) {
   const { t } = useTranslation()
   const home = taxHome(locations)
   const presets = useTaxPresetTables()
-  const title = home
-    ? t('business.taxes.titleRegion', { region: `${home.province}, ${t(`business.countries.${home.country}`)}` })
-    : t('business.taxes.title')
 
   if (!home) {
     const stored = (workspace.taxRegistrations ?? []).filter((r) => r.type !== 'BN' && r.type !== 'EIN')
     return (
-      <SectionCard title={title} testId="card-taxes">
+      <div className="space-y-4">
         <p className="text-sm text-ink-subtle" data-testid="taxes-need-head-office">
           {t('business.taxes.needHeadOffice')}
         </p>
@@ -93,12 +85,18 @@ export function TaxesCard({
             )}
           />
         ) : null}
-      </SectionCard>
+      </div>
     )
   }
+  const basedOn = (
+    <p className="text-sm text-ink" data-testid="taxes-based-on">
+      {t('business.taxes.basedOn', { region: `${home.province}, ${t(`business.countries.${home.country}`)}` })}
+    </p>
+  )
   if (!presets.data) {
     return (
-      <SectionCard title={title} testId="card-taxes">
+      <div className="space-y-4">
+        {basedOn}
         {presets.error ? (
           <div className="space-y-2">
             <p className="text-sm text-error">{t('business.taxes.error')}</p>
@@ -107,34 +105,57 @@ export function TaxesCard({
             </Button>
           </div>
         ) : (
-          <p className="text-sm text-ink-subtle">{t('business.loading')}</p>
+          <p role="status" className="text-sm text-ink-subtle">{t('business.loading')}</p>
         )}
-      </SectionCard>
+      </div>
     )
   }
   return (
-    <TaxRows
-      title={title}
-      workspace={workspace}
-      initial={taxValues(workspace, home, regionTaxes(presets.data, home)).rows}
-      country={home.country}
-      canEdit={canEdit}
-    />
+    <div className="space-y-4">
+      {basedOn}
+      <TaxRows
+        workspace={workspace}
+        initial={taxValues(workspace, home, regionTaxes(presets.data, home)).rows}
+        country={home.country}
+        canEdit={canEdit}
+        write={write}
+        back={back}
+      />
+    </div>
+  )
+}
+
+const isBn = (r: { type: string }) => r.type === 'BN' || r.type === 'EIN'
+
+export function BusinessTaxesPage() {
+  const { t } = useTranslation()
+  const o = businessOption('taxes')
+  return (
+    <BusinessPage title={t(o.label)} paragraph={t(o.paragraph)} testId="business-taxes">
+      {(ctx) => {
+        const head = ctx.locations.find((l) => l.isHeadOffice && !l.isArchived)
+        // The rows restart when the stored registrations or the head office's region change.
+        const key = JSON.stringify([head?.address.country, head?.address.state, (ctx.workspace.taxRegistrations ?? []).filter((r) => !isBn(r))])
+        return <Taxes key={key} {...ctx} />
+      }}
+    </BusinessPage>
   )
 }
 
 function TaxRows({
-  title,
   workspace,
   initial,
   country,
   canEdit,
+  write,
+  back,
 }: {
-  title: string
   workspace: IWorkspaceDTO
   initial: ITaxRow[]
   country: 'CA' | 'US'
   canEdit: boolean
+  write: IBusinessContext['write']
+  back: () => void
 }) {
   const { t } = useTranslation()
   const { updateWorkspace } = useWorkspaceProfile()
@@ -145,16 +166,6 @@ function TaxRows({
   const sources = useRef<string[]>([])
   const rows = d.values.rows
   const optional = (label: string) => `${label} ${t('business.optional')}`
-
-  if (!canEdit) {
-    return (
-      <SectionCard title={title} testId="card-taxes">
-        {start.map((r) => (
-          <Detail key={r.key} label={[rowName(t, r), percent(r.rate)].filter(Boolean).join(' · ')} value={r.number} />
-        ))}
-      </SectionCard>
-    )
-  }
 
   const patch = (key: string, p: Partial<ITaxRow>) => {
     d.setValues((prev) => ({ rows: prev.rows.map((r) => (r.key === key ? { ...r, ...p } : r)) }))
@@ -169,13 +180,13 @@ function TaxRows({
     if (Object.keys(e).some((k) => k.endsWith('.rate') || !k.startsWith('derived'))) setOpen(true)
     return e
   }
-  const onSave = () =>
-    void d.save(
+  const onSave = async () => {
+    const ok = await d.save(
       check,
       async () => {
         const built = taxInput(rows, workspace)
         sources.current = built.sources
-        await updateWorkspace(built.input)
+        await write(() => updateWorkspace(built.input))
       },
       (path) => {
         const f = taxErrorField(path, sources.current)
@@ -183,6 +194,8 @@ function TaxRows({
         return f
       },
     )
+    if (ok) back()
+  }
 
   const rateInput = (r: ITaxRow) => (
     <Input
@@ -197,8 +210,9 @@ function TaxRows({
   const extra = rows.filter((r) => !r.derived)
 
   return (
-    <SectionCard title={title} testId="card-taxes">
+    <div className="space-y-4" data-testid="taxes-form">
       <CardError message={d.formError} />
+      <fieldset disabled={!canEdit} className="min-w-0 space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         {derived.map((r) => (
           <div key={r.key} className="space-y-1" data-testid={`tax-${r.key}`}>
@@ -216,7 +230,7 @@ function TaxRows({
           </div>
         ))}
       </div>
-      <Disclosure label={t('business.taxes.custom')} open={open} onToggle={() => setOpen(!open)}>
+      <Disclosure label={t('business.taxes.customize')} open={open} onToggle={() => setOpen(!open)}>
         <div className="grid gap-4 md:grid-cols-2">
           {derived
             .filter((r) => r.presetRate !== null)
@@ -228,6 +242,7 @@ function TaxRows({
           <div key={r.key} className="space-y-3 rounded-lg border border-hairline p-3" data-testid={`tax-${r.key}`}>
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-ink">{rowName(t, r)}</p>
+              {canEdit ? (
               <IconButton
                 icon={X}
                 size="sm"
@@ -235,6 +250,7 @@ function TaxRows({
                 aria-label={t('business.taxes.remove')}
                 onClick={() => d.setValues((prev) => ({ rows: prev.rows.filter((x) => x.key !== r.key) }))}
               />
+              ) : null}
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <LabeledSelect
@@ -272,27 +288,22 @@ function TaxRows({
             </div>
           </div>
         ))}
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() => {
-            counter.current += 1
-            const row = newTaxRow(country, counter.current)
-            d.setValues((prev) => ({ rows: [...prev.rows, row] }))
-          }}
-        >
-          {t('business.taxes.add')}
-        </Button>
+        {canEdit ? (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => {
+              counter.current += 1
+              const row = newTaxRow(country, counter.current)
+              d.setValues((prev) => ({ rows: [...prev.rows, row] }))
+            }}
+          >
+            {t('business.taxes.add')}
+          </Button>
+        ) : null}
       </Disclosure>
-      <SaveBar
-        visible={d.dirty}
-        saving={d.saving}
-        onSave={onSave}
-        onCancel={() => {
-          d.reset()
-          setOpen(ratesCustomized(start) || start.some((r) => !r.derived))
-        }}
-      />
-    </SectionCard>
+      </fieldset>
+      {canEdit ? <FormFooter saving={d.saving} onSave={() => void onSave()} onDiscard={back} /> : null}
+    </div>
   )
 }

@@ -3,8 +3,13 @@ import { useTranslation } from '../../../hooks/useTranslation'
 import { errorMessage } from '../../../lib/apiErrors'
 import { reasonKey } from '../../../lib/business'
 
-/** Runs a list action (saved at once) and keeps its failure as the card's message. */
-export function useAction() {
+type Write = <R>(fn: () => Promise<R>) => Promise<R>
+
+/**
+ * Runs a list action (saved at once) and keeps its failure as the list's
+ * message. `write` is the page's (a 409 WORKSPACE_ARCHIVED re-reads the workspace).
+ */
+export function useAction(write?: Write) {
   const { t } = useTranslation()
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -12,7 +17,7 @@ export function useAction() {
     setError(null)
     setBusy(true)
     try {
-      await fn()
+      await (write ? write(fn) : fn())
       return true
     } catch (err) {
       // A known refusal in words, else the error table.

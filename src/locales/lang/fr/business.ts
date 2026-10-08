@@ -16,6 +16,49 @@ const business: typeof enBusiness = {
   cancel: 'Annuler',
   more: 'Autres actions',
   empty: 'Ne peut pas être vide',
+  // The hub (docs/ux/BUSINESS-SCREEN.md): groups, rows, each page's paragraph.
+  group: {
+    business: {
+      title: 'Entreprise',
+      description: 'Comment votre entreprise apparaît sur vos soumissions, factures et messages.',
+    },
+    contact: {
+      title: 'Coordonnées',
+      description: 'Comment vos clients et votre équipe vous joignent.',
+    },
+    documents: {
+      title: 'Taxes et documents',
+      description: 'Les taxes que vous facturez et la numérotation de vos documents.',
+    },
+    preferences: {
+      title: 'Préférences',
+      description: 'Langue, fuseau horaire et devise de vos documents.',
+    },
+  },
+  option: {
+    profile: 'Profil de l’entreprise',
+    legal: 'Renseignements juridiques',
+    emails: 'Courriels',
+    phones: 'Numéros de téléphone',
+    locations: 'Établissements',
+    taxes: 'Taxes',
+    numbers: 'Numérotation des documents',
+    regional: 'Paramètres régionaux',
+  },
+  paragraph: {
+    profile: 'Votre logo, votre nom, votre slogan, votre secteur et votre site Web, tels que vos clients les voient.',
+    legal: 'La raison sociale, la forme juridique et le numéro d’entreprise sur vos factures.',
+    emails: 'Le courriel principal figure sur vos documents. Ajoutez-en d’autres pour la facturation ou la répartition.',
+    phones: 'Le numéro principal figure sur vos documents. Ajoutez-en d’autres pour le bureau ou la répartition.',
+    locations: 'Votre siège social détermine vos taxes et votre fuseau horaire. Ajoutez vos autres bureaux et ateliers.',
+    taxes: 'Les taxes sur vos soumissions et factures, avec vos numéros d’inscription.',
+    numbers: 'La numérotation de vos factures, soumissions et travaux.',
+    regional: 'La langue, le fuseau horaire et la devise de vos documents.',
+  },
+  footer: {
+    save: 'Enregistrer les modifications',
+    discard: 'Annuler les modifications',
+  },
   logo: {
     a11y: 'Logo de l’entreprise',
     add: 'Ajouter un logo',
@@ -23,14 +66,11 @@ const business: typeof enBusiness = {
     uploading: 'Envoi du logo…',
     prepareError: 'Impossible de préparer cette image. Essayez-en une autre.',
     delete: 'Supprimer',
-    deleteA11y: 'Supprimer le logo',
   },
   profile: {
-    title: 'Profil',
     name: 'Nom de l’entreprise',
     slogan: 'Slogan',
     sector: 'Secteur',
-    legal: 'Renseignements juridiques',
     legalName: 'Raison sociale (si différente)',
     type: 'Forme juridique',
   },
@@ -64,7 +104,7 @@ const business: typeof enBusiness = {
     other: 'Autre',
   },
   contact: {
-    title: 'Coordonnées',
+    primaryBadge: 'Principal',
     emails: 'Courriels',
     phones: 'Numéros de téléphone',
     emailEmpty: 'Aucun courriel pour l’instant.',
@@ -76,9 +116,7 @@ const business: typeof enBusiness = {
     labelPlaceholder: 'p. ex. Facturation, Répartition',
     editLabel: 'Modifier le libellé',
     remove: 'Retirer',
-    emailAddLabel: 'Autre courriel',
     emailAdd: 'Ajouter le courriel',
-    phoneAddLabel: 'Autre numéro',
     phoneAdd: 'Ajouter le numéro',
     emailError: 'Entrez une adresse courriel valide',
     phoneError: 'Veuillez saisir un numéro de téléphone valide',
@@ -112,6 +150,8 @@ const business: typeof enBusiness = {
     keep: 'Garder l’adresse actuelle',
     imprecise: 'Choisissez un résultat plus précis : une adresse civique, pas une ville ni une région.',
     pick: 'Recherchez l’adresse et choisissez-la parmi les suggestions.',
+    editTitle: 'Modifier l’établissement',
+    notFound: 'Cet établissement est introuvable. Il a peut-être été supprimé.',
     maps: 'Ouvrir dans Plans',
   },
   reason: {
@@ -123,13 +163,12 @@ const business: typeof enBusiness = {
     LIMIT_REACHED: 'Vous avez atteint la limite de cette liste — retirez-en un pour en ajouter un autre.',
   },
   taxes: {
-    title: 'Taxes',
-    titleRegion: 'Taxes — {region}',
     needHeadOffice: 'Ajoutez d’abord votre siège social : les taxes suivent sa province ou son État.',
     stored: 'Numéros de taxes',
     error: 'Les taux de taxes n’ont pas pu être chargés.',
     rateHelp: 'Taux : {rate}',
-    custom: 'Autres taux / ajouter une taxe',
+    basedOn: 'Selon votre siège social : {region}.',
+    customize: 'Personnaliser les taux',
     add: 'Ajouter un numéro de taxes',
     remove: 'Retirer ce numéro de taxes',
     country: 'Pays',
@@ -149,7 +188,6 @@ const business: typeof enBusiness = {
     },
   },
   numbers: {
-    title: 'Numérotation des documents',
     prefix: 'Préfixe',
     placeholder: 'p. ex. {example}',
     error: 'Jusqu’à 10 lettres, chiffres ou tirets',
@@ -161,7 +199,6 @@ const business: typeof enBusiness = {
   },
   settingsUnavailable: 'Ces paramètres n’ont pas pu être chargés — ils restent tels quels.',
   regional: {
-    title: 'Paramètres régionaux',
     locale: 'Langue des documents',
     timezone: 'Fuseau horaire',
     timezoneSuggested: 'Selon votre siège social : {zone}',
@@ -175,8 +212,8 @@ const business: typeof enBusiness = {
   },
   address: {
     placeholder: 'Trouver une adresse précise sur la carte…',
-    detailsError: 'Cette adresse n’a pas pu être chargée. Choisissez-la de nouveau.',
-    searchError: 'La recherche d’adresse est indisponible pour le moment — saisissez l’adresse.',
+    detailsError: 'Nous n’avons pas pu charger cette adresse. Choisissez-la de nouveau dans les suggestions.',
+    searchError: 'Nous n’avons pas pu charger les suggestions d’adresses. Vérifiez votre connexion et réessayez.',
   },
   phone: {
     placeholder: 'Saisir un numéro de téléphone',

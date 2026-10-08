@@ -1,6 +1,6 @@
-import type { IWorkspaceDTO, IWorkspaceLocationDTO, IWorkspaceSettingsDTO } from '@fonderie/client'
+import type { IWorkspaceSettingsDTO } from '@fonderie/client'
 import { useWorkspaceProfile, useWorkspaceSettings } from '@fonderie/react-workspaces'
-import { useId, useMemo } from 'react'
+import { useId, useMemo, type ReactNode } from 'react'
 import { Button } from '../../../components/Button'
 import { Input } from '../../../components/Input'
 import { Select } from '../../../components/Select'
@@ -26,15 +26,16 @@ import {
 import { cn } from '../../../lib/cn'
 import { allTimeZones, regionTimeZone, timeZoneLabel } from '../../../lib/timeZones'
 import { localeTags } from '../../../locales'
-import { CardError, Detail, Disclosure, LabeledSelect, Prompt, SaveBar, SectionCard } from './parts'
+import { businessOption } from '../../../constants/businessMenu'
+import { CardError, Disclosure, FormFooter, LabeledSelect, Prompt } from './parts'
+import { BusinessPage, type IBusinessContext } from './Shell'
 
-// Document numbers and Regional settings (the mobile app's BusinessSettings.tsx).
+// Document numbers and Regional settings (the mobile app's BusinessSettings.tsx):
+// each its own page, writing only its own settings — never while the settings
+// are unread.
 
-interface ISettingsState {
-  settings: IWorkspaceSettingsDTO | null
-  settingsLoading: boolean
-  settingsError: boolean
-}
+/** The fields a page edits, as a key: the form restarts on them when the stored values change. */
+const formKey = (...parts: unknown[]) => JSON.stringify(parts)
 
 /** While the settings load / when they cannot be read: a line, never a form that could write blind. */
 function SettingsPending({ loading }: { loading: boolean }) {
@@ -54,31 +55,14 @@ const KIND_LABEL = {
   job: 'business.numbers.job',
 } as const satisfies Record<PrefixKind, string>
 
-export function NumbersCard({ settings, settingsLoading, settingsError, canEdit }: ISettingsState & { canEdit: boolean }) {
+function NumbersForm({ settings, canEdit, write, back }: IBusinessContext & { settings: IWorkspaceSettingsDTO }) {
   const { t } = useTranslation()
   const { updateSettings } = useWorkspaceSettings()
   const initial = useMemo(() => prefixValues(settings), []) // eslint-disable-line react-hooks/exhaustive-deps
   const d = useCardDraft<IPrefixValues>(initial)
-  const title = t('business.numbers.title')
-
-  if (!settings) {
-    return (
-      <SectionCard title={title} testId="card-numbers">
-        <SettingsPending loading={settingsLoading && !settingsError} />
-      </SectionCard>
-    )
-  }
   const v = d.values
   const preview = previewOf(effectivePrefixes(v))
   const previewLine = PREFIX_KINDS.map((k) => preview[k]).join(' · ')
-
-  if (!canEdit) {
-    return (
-      <SectionCard title={title} testId="card-numbers">
-        <Detail label={t('business.numbers.preview')} value={previewLine} />
-      </SectionCard>
-    )
-  }
 
   const upper = (x: string) => x.toUpperCase().slice(0, MAX.prefix)
   const prefixError = t('business.numbers.error')
@@ -89,11 +73,11 @@ export function NumbersCard({ settings, settingsLoading, settingsError, canEdit 
     } else if (!isValidPrefix(v.single)) e.prefix = prefixError
     return e
   }
-  const onSave = () =>
-    void d.save(
+  const onSave = async () => {
+    const ok = await d.save(
       check,
       async () => {
-        await updateSettings(prefixInput(v, settings))
+        await write(() => updateSettings(prefixInput(v, settings)))
       },
       (path) => {
         const m = path ? /^documentPrefixes\.(\w+)/.exec(path) : null
@@ -101,6 +85,8 @@ export function NumbersCard({ settings, settingsLoading, settingsError, canEdit 
         return v.customized ? `prefix.${m[1]}` : 'prefix'
       },
     )
+    if (ok) back()
+  }
   // Opening "Customize" starts each kind from the shared prefix; closing it
   // goes back to one prefix (the invoice's) for all.
   const toggle = () =>
@@ -111,8 +97,9 @@ export function NumbersCard({ settings, settingsLoading, settingsError, canEdit 
     )
 
   return (
-    <SectionCard title={title} testId="card-numbers">
+    <div className="space-y-4" data-testid="numbers-form">
       <CardError message={d.formError} />
+      <fieldset disabled={!canEdit} className="min-w-0 space-y-4">
       {!v.customized ? (
         <Input
           label={`${t('business.numbers.prefix')} ${t('business.optional')}`}
@@ -143,43 +130,44 @@ export function NumbersCard({ settings, settingsLoading, settingsError, canEdit 
           ))}
         </div>
       </Disclosure>
-      <SaveBar visible={d.dirty} saving={d.saving} onSave={onSave} onCancel={d.reset} />
-    </SectionCard>
+      </fieldset>
+      {canEdit ? <FormFooter saving={d.saving} onSave={() => void onSave()} onDiscard={back} /> : null}
+    </div>
+  )
+}
+
+/** The settings both pages edit: read first, else a line and no form (they are never written blind). */
+function WithSettings({ children }: { children: (settings: IWorkspaceSettingsDTO) => ReactNode }) {
+  const { settings, isLoading, error } = useWorkspaceSettings()
+  if (!settings) return <SettingsPending loading={isLoading && !error} />
+  return <>{children(settings)}</>
+}
+
+export function BusinessNumbersPage() {
+  const { t } = useTranslation()
+  const o = businessOption('numbers')
+  return (
+    <BusinessPage title={t(o.label)} paragraph={t(o.paragraph)} testId="business-numbers">
+      {(ctx) => (
+        <WithSettings>
+          {(settings) => <NumbersForm key={formKey(ctx.workspace.id, settings.documentPrefixes ?? null)} {...ctx} settings={settings} />}
+        </WithSettings>
+      )}
+    </BusinessPage>
   )
 }
 
 // ── Regional settings ────────────────────────────────────────────────────────
 
-const languageName = (code: string) => APP_LANGUAGES.find((l) => l.code === code)?.name ?? code
 
-export function RegionalCard({
-  workspace,
-  settings,
-  settingsLoading,
-  settingsError,
-  locations,
-  country,
-  canEdit,
-}: ISettingsState & { workspace: IWorkspaceDTO; locations: IWorkspaceLocationDTO[]; country: 'CA' | 'US'; canEdit: boolean }) {
+function RegionalForm({ workspace, settings, locations, country, canEdit, write, back }: IBusinessContext & { settings: IWorkspaceSettingsDTO }) {
   const { t, locale } = useTranslation()
   const tzId = useId()
   const { updateSettings } = useWorkspaceSettings()
   const { updateWorkspace } = useWorkspaceProfile()
-  const initial = useMemo<IRegionalValues>(
-    () => (settings ? regionalValues(workspace, settings) : { locale: '', timezone: '', currency: '', languages: [] }),
-    [], // eslint-disable-line react-hooks/exhaustive-deps
-  )
+  const initial = useMemo<IRegionalValues>(() => regionalValues(workspace, settings), []) // eslint-disable-line react-hooks/exhaustive-deps
   const d = useCardDraft<IRegionalValues>(initial)
-  const title = t('business.regional.title')
   const zones = useMemo(() => allTimeZones(), [])
-
-  if (!settings) {
-    return (
-      <SectionCard title={title} testId="card-regional">
-        <SettingsPending loading={settingsLoading && !settingsError} />
-      </SectionCard>
-    )
-  }
   const v = d.values
   const head = headOfficeOf(locations)
   const zone = head ? regionTimeZone(head.address.country, head.address.state) : null
@@ -187,38 +175,30 @@ export function RegionalCard({
   const tag = localeTags[locale]
   const zoneText = (z: string) => (z ? `${timeZoneLabel(z, tag)} · ${z}` : '')
 
-  if (!canEdit) {
-    return (
-      <SectionCard title={title} testId="card-regional">
-        <Detail label={t('business.regional.locale')} value={initial.locale ? languageName(initial.locale) : ''} />
-        <Detail label={t('business.regional.timezone')} value={zoneText(initial.timezone)} />
-        <Detail label={t('business.regional.currency')} value={initial.currency} />
-        <Detail label={t('business.regional.languages')} value={initial.languages.map(languageName).join(', ')} />
-      </SectionCard>
-    )
-  }
-
-  const onSave = () =>
-    void d.save(
+  const onSave = async () => {
+    const ok = await d.save(
       () => ({}),
       async () => {
         const out = regionalInput(v, initial, workspace, country)
-        if (out.settings) await updateSettings(out.settings)
-        if (out.workspace) await updateWorkspace(out.workspace)
+        if (out.settings) await write(() => updateSettings(out.settings!))
+        if (out.workspace) await write(() => updateWorkspace(out.workspace!))
       },
       (path) => {
         const root = path?.split('.')[0]
         return root === 'locale' || root === 'timezone' || root === 'currency' || root === 'languages' ? root : null
       },
     )
+    if (ok) back()
+  }
   const currencies = [...new Set(['CAD', 'USD', ...(v.currency ? [v.currency] : [])])]
   const toggleLanguage = (code: string) =>
     d.set({ languages: v.languages.includes(code) ? v.languages.filter((x) => x !== code) : [...v.languages, code] })
   const zoneOptions = zones.map((z) => ({ value: z, label: zoneText(z) }))
 
   return (
-    <SectionCard title={title} testId="card-regional">
+    <div className="space-y-4" data-testid="regional-form">
       <CardError message={d.formError} />
+      <fieldset disabled={!canEdit} className="min-w-0 space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <LabeledSelect
           label={t('business.regional.locale')}
@@ -238,9 +218,10 @@ export function RegionalCard({
             placeholder={t('business.notSet')}
             noOptionsMessage={() => t('business.regional.timezoneNone')}
             aria-label={t('business.regional.timezone')}
+            isDisabled={!canEdit}
             onChange={(o) => o && d.set({ timezone: o.value })}
           />
-          {zone && zone !== v.timezone ? (
+          {canEdit && zone && zone !== v.timezone ? (
             <Button size="xs" variant="secondary" className="mt-2" data-testid="timezone-suggestion" onClick={() => d.set({ timezone: zone })}>
               {t('business.regional.timezoneSuggested', { zone: timeZoneLabel(zone, tag) })}
             </Button>
@@ -256,7 +237,7 @@ export function RegionalCard({
           error={d.errors.currency}
         />
       </div>
-      {head && v.currency !== usual ? (
+      {canEdit && head && v.currency !== usual ? (
         <Prompt
           testId="currency-suggestion"
           text={t('business.regional.currencySuggested', { currency: usual, country: t(`business.countries.${country}`) })}
@@ -290,7 +271,31 @@ export function RegionalCard({
         <p className="mt-1.5 text-xs text-ink-subtle">{t('business.regional.languagesHelp')}</p>
         {d.errors.languages ? <p className="mt-1.5 text-xs text-error">{d.errors.languages}</p> : null}
       </fieldset>
-      <SaveBar visible={d.dirty} saving={d.saving} onSave={onSave} onCancel={d.reset} />
-    </SectionCard>
+      </fieldset>
+      {canEdit ? <FormFooter saving={d.saving} onSave={() => void onSave()} onDiscard={back} /> : null}
+    </div>
+  )
+}
+
+export function BusinessRegionalPage() {
+  const { t } = useTranslation()
+  const o = businessOption('regional')
+  return (
+    <BusinessPage title={t(o.label)} paragraph={t(o.paragraph)} testId="business-regional">
+      {(ctx) => {
+        const head = ctx.locations.find((l) => l.isHeadOffice && !l.isArchived)
+        return (
+          <WithSettings>
+            {(settings) => (
+              <RegionalForm
+                key={formKey(ctx.workspace.id, settings.locale, settings.timezone, settings.currency, ctx.workspace.languages, head?.address.state)}
+                {...ctx}
+                settings={settings}
+              />
+            )}
+          </WithSettings>
+        )
+      }}
+    </BusinessPage>
   )
 }

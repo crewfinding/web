@@ -14,12 +14,13 @@ import type { IAddressParts, ITaxPresets } from './placeParts'
 import { asCountry, isValidPhone, normalizePhone } from './phone'
 import type { TranslationKey } from '../locales'
 
-// The business profile IS the Fonderie workspace. The screen is a column of
-// cards — Profile, Contact, Locations, Taxes, Document numbers, Regional
-// settings — and each card saves ONLY its own fields: a card's body is built
-// here from its values plus the latest server state, never from another
-// card's unsaved draft. The server refuses a bad value with 422
-// '<field path>: <why>'; each card maps that path onto its own field.
+// The business profile IS the Fonderie workspace. Business info is a hub
+// whose rows open one page each — Business profile, Legal details, Emails,
+// Phone numbers, Locations, Taxes, Document numbers, Regional settings — and
+// each page saves ONLY its own fields: a page's body is built here from its
+// values plus the latest server state, never from another page's draft. The
+// server refuses a bad value with 422 '<field path>: <why>'; each page maps
+// that path onto its own field.
 
 /** The legal forms the server accepts (workspaces' BUSINESS_TYPES). */
 export const BUSINESS_TYPES = ['SOLE_PROP', 'PARTNERSHIP', 'LLC', 'INC', 'NONPROFIT', 'COOPERATIVE'] as const
@@ -142,7 +143,7 @@ export const reasonKey = (err: unknown): TranslationKey | null => {
   return (CONTACT_REASONS as readonly string[]).includes(r) ? (`business.reason.${r}` as TranslationKey) : null
 }
 
-// ── Tax registrations (shared by Profile and Taxes) ──────────────────────────
+// ── Tax registrations (shared by Legal details and Taxes) ──────────────────────────
 
 /** A registration as the PUT body carries it. */
 type RegistrationInput = NonNullable<IUpdateWorkspaceInput['taxRegistrations']>[number]
@@ -156,13 +157,13 @@ const asInput = (r: ITaxRegistrationDTO): RegistrationInput => ({
   rate: typeof r.rate === 'number' ? r.rate : null,
 })
 
-/** BN (Canada) / EIN (US): the business number, which the Profile card owns. */
+/** BN (Canada) / EIN (US): the business number, which the Legal details page owns. */
 const isBusinessNumber = (r: ITaxRegistrationDTO) => {
   const c = countryCode(r.country)
   return (c === 'CA' && r.type === 'BN') || (c === 'US' && r.type === 'EIN')
 }
 
-// ── Profile ──────────────────────────────────────────────────────────────────
+// ── Business profile ─────────────────────────────────────────────────────────
 
 export interface IProfileValues {
   name: string
@@ -170,18 +171,42 @@ export interface IProfileValues {
   motto: string
   /** The trade (workspace.industry), a key of TRADES — or what another app stored. */
   industry: string
+  website: string
+}
+
+export const profileValues = (ws: IWorkspaceDTO): IProfileValues => ({
+  name: ws.name ?? '',
+  motto: ws.motto ?? '',
+  industry: ws.industry ?? '',
+  website: ws.website ?? '',
+})
+
+/** The Business profile page's PUT /workspaces body: { name, motto, industry, website } only (blank → null). */
+export const profileInput = (v: IProfileValues): IUpdateWorkspaceInput => ({
+  name: v.name.trim(),
+  motto: orNull(v.motto),
+  industry: orNull(v.industry),
+  website: normalizeWebsite(v.website),
+})
+
+const PROFILE_FIELDS = new Set(['name', 'motto', 'industry', 'website'])
+
+/** Where a 422 on the Business profile page belongs: one of its fields, or null (shown above the form). */
+export const profileErrorField = (path: string | null): keyof IProfileValues | null =>
+  path && PROFILE_FIELDS.has(path) ? (path as keyof IProfileValues) : null
+
+// ── Legal details ────────────────────────────────────────────────────────────
+
+export interface ILegalValues {
   legalName: string
   businessType: string
   /** BN (Canada) or EIN (US) — a tax registration, not a field of its own. */
   businessNumber: string
 }
 
-export const profileValues = (ws: IWorkspaceDTO, country: 'CA' | 'US'): IProfileValues => {
+export const legalValues = (ws: IWorkspaceDTO, country: 'CA' | 'US'): ILegalValues => {
   const bn = (ws.taxRegistrations ?? []).find((r) => isBusinessNumber(r) && countryCode(r.country) === country)
   return {
-    name: ws.name ?? '',
-    motto: ws.motto ?? '',
-    industry: ws.industry ?? '',
     legalName: ws.legalName ?? '',
     businessType: ws.businessType ?? '',
     businessNumber: bn?.number ?? '',
@@ -189,16 +214,13 @@ export const profileValues = (ws: IWorkspaceDTO, country: 'CA' | 'US'): IProfile
 }
 
 /**
- * The Profile card's PUT /workspaces body. The business number lives in
- * taxRegistrations (a whole-list replace), so when it changed the list is
- * rebuilt from the SERVER's registrations with only the BN / EIN swapped —
- * the Taxes card's unsaved rows are never part of it.
+ * The Legal details page's PUT /workspaces body: { legalName, businessType },
+ * plus taxRegistrations only when the number changed. That list is a whole
+ * replace, so it is rebuilt from the SERVER's registrations with only the
+ * BN / EIN swapped — nothing of the Taxes page rides along.
  */
-export const profileInput = (v: IProfileValues, initial: IProfileValues, ws: IWorkspaceDTO, country: 'CA' | 'US'): IUpdateWorkspaceInput => {
+export const legalInput = (v: ILegalValues, initial: ILegalValues, ws: IWorkspaceDTO, country: 'CA' | 'US'): IUpdateWorkspaceInput => {
   const input: IUpdateWorkspaceInput = {
-    name: v.name.trim(),
-    motto: orNull(v.motto),
-    industry: orNull(v.industry),
     legalName: orNull(v.legalName),
     businessType: orNull(v.businessType),
   }
@@ -212,12 +234,10 @@ export const profileInput = (v: IProfileValues, initial: IProfileValues, ws: IWo
   return input
 }
 
-const PROFILE_FIELDS = new Set(['name', 'motto', 'industry', 'legalName', 'businessType'])
-
-/** Where a 422 on the Profile card belongs: one of its fields, or null (shown on the card). */
-export const profileErrorField = (path: string | null): keyof IProfileValues | null => {
+/** Where a 422 on the Legal details page belongs. */
+export const legalErrorField = (path: string | null): keyof ILegalValues | null => {
   if (!path) return null
-  if (PROFILE_FIELDS.has(path)) return path as keyof IProfileValues
+  if (path === 'legalName' || path === 'businessType') return path
   if (path.startsWith('taxRegistrations.')) return 'businessNumber'
   return null
 }

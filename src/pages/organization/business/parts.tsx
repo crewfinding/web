@@ -5,7 +5,7 @@ import { Card } from '../../../components/Card'
 import { Notice } from '../../../components/Notice'
 import { useTranslation } from '../../../hooks/useTranslation'
 
-// The pieces every Business card shares (the mobile app's BusinessCard.tsx).
+// The pieces the Business pages share (the mobile app's BusinessShared.tsx).
 
 /** A titled card; `testId` for tests. */
 export function SectionCard({ title, testId, action, children }: { title: string; testId: string; action?: ReactNode; children: ReactNode }) {
@@ -23,28 +23,30 @@ export function SectionCard({ title, testId, action, children }: { title: string
   )
 }
 
-/** Save / Cancel, shown while the card has unsaved changes. */
-export function SaveBar({ visible, saving, onSave, onCancel }: { visible: boolean; saving: boolean; onSave: () => void; onCancel: () => void }) {
+/**
+ * The bottom of every form page (the app's FormFooter): Save changes, then
+ * Discard changes — back without saving. Not shown to those who cannot edit.
+ */
+export function FormFooter({ saving, onSave, onDiscard }: { saving: boolean; onSave: () => void; onDiscard: () => void }) {
   const { t } = useTranslation()
-  if (!visible) return null
   return (
-    <div className="flex gap-2">
-      <Button size="sm" loading={saving} disabled={saving} onClick={onSave}>
-        {t('business.save')}
+    <div className="flex flex-wrap gap-2 border-t border-hairline pt-4" data-testid="form-footer">
+      <Button loading={saving} disabled={saving} onClick={onSave}>
+        {t('business.footer.save')}
       </Button>
-      <Button size="sm" variant="ghost" onClick={onCancel}>
-        {t('business.cancel')}
+      <Button variant="danger" disabled={saving} onClick={onDiscard}>
+        {t('business.footer.discard')}
       </Button>
     </div>
   )
 }
 
-/** A card's banner error. */
+/** A page's (or list's) error, above the form. */
 export function CardError({ message }: { message: string | null }) {
   return message ? <Notice tone="error">{message}</Notice> : null
 }
 
-/** "▸ Legal details" — a section folded until asked for. */
+/** "▸ Customize rates" — a section folded until asked for. */
 export function Disclosure({ label, open, onToggle, children }: { label: string; open: boolean; onToggle: () => void; children: ReactNode }) {
   const id = useId()
   return (
@@ -68,7 +70,7 @@ export function Disclosure({ label, open, onToggle, children }: { label: string;
   )
 }
 
-/** A label over a value (read-only cards); "Not set" when empty. */
+/** A label over a value (read-only text); "Not set" when empty. */
 export function Detail({ label, value }: { label: string; value: string | string[] | null | undefined }) {
   const { t } = useTranslation()
   const lines = (Array.isArray(value) ? value : [value ?? '']).filter((l) => l && l.trim().length)

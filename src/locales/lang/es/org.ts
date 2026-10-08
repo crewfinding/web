@@ -2,7 +2,21 @@ import type enOrg from '../en/org'
 
 const org: typeof enOrg = {
   title: 'Organización',
-  intro: 'Gestiona los detalles de tu organización, equipo y facturación.',
+  // The Organization hub's groups (the mobile app's cards): a title and a one-line description each.
+  groups: {
+    business: {
+      title: 'Datos empresariales',
+      description: 'El perfil, los datos de contacto, los impuestos y los documentos de tu empresa.',
+    },
+    team: {
+      title: 'Equipo',
+      description: 'Invita personas y administra los roles y lo que cada quien puede hacer.',
+    },
+    billing: {
+      title: 'Facturación',
+      description: 'Tu plan, tu método de pago y tus facturas.',
+    },
+  },
   nav: {
     label: 'Secciones de la organización',
     info: 'Información empresarial',

@@ -14,6 +14,10 @@ import {
   prefixInput,
   prefixValues,
   previewOf,
+  legalErrorField,
+  legalInput,
+  legalValues,
+  profileErrorField,
   profileInput,
   profileValues,
   ratesCustomized,
@@ -33,7 +37,7 @@ import { isValidPhone, normalizePhone, toE164 } from './phone'
 import { partsFromDetails } from './placeParts'
 import { regionTimeZone } from './timeZones'
 
-// The Business page's rules (docs/parity/3-business.md) — the same cases as the
+// The Business pages' rules (docs/ux/BUSINESS-SCREEN.md of the mobile app) — the same cases as the
 // mobile app's business-screen-rules test where they are pure.
 
 const GST = { code: 'GST', label: 'GST', rate: 0.05 }
@@ -92,19 +96,34 @@ const loc = (patch: Partial<IWorkspaceLocationDTO> = {}): IWorkspaceLocationDTO 
 const rowsFor = (province: string, country: 'CA' | 'US' = 'CA', regs: unknown[] = []) =>
   taxValues(ws({ taxRegistrations: regs as never }), { country, province }, regionTaxes(PRESETS as never, { country, province })).rows
 
-describe('Profile', () => {
-  it('sends only the profile fields; the BN swaps only itself', () => {
+// Each page saves ONLY its own fields (docs/ux/BUSINESS-SCREEN.md §3).
+describe('Business profile page', () => {
+  it('sends { name, motto, industry, website } only — blanks as null, a website without scheme gets https://', () => {
+    const w = ws({ taxRegistrations: [GST_REG, BN] as never, legalName: 'Acme Inc.', businessType: 'INC' })
+    const initial = profileValues(w)
+    const out = profileInput({ ...initial, name: ' Acme Moving ', motto: '  ', website: 'acme.ca' })
+    expect(out).toEqual({ name: 'Acme Moving', motto: null, industry: 'moving', website: 'https://acme.ca' })
+    expect(Object.keys(out).sort()).toEqual(['industry', 'motto', 'name', 'website'])
+  })
+  it('a 422 lands on its own field, anything else above the form', () => {
+    expect(profileErrorField('website')).toBe('website')
+    expect(profileErrorField('legalName')).toBeNull()
+    expect(profileErrorField(null)).toBeNull()
+  })
+})
+
+describe('Legal details page', () => {
+  it('sends { legalName, businessType } only while the number is unchanged', () => {
     const w = ws({ taxRegistrations: [GST_REG, BN] as never })
-    const initial = profileValues(w, 'CA')
+    const initial = legalValues(w, 'CA')
     expect(initial.businessNumber).toBe('123456789')
-    expect(Object.keys(profileInput({ ...initial, name: 'Acme Moving' }, initial, w, 'CA'))).toEqual([
-      'name',
-      'motto',
-      'industry',
-      'legalName',
-      'businessType',
-    ])
-    const out = profileInput({ ...initial, businessNumber: '987654321' }, initial, w, 'CA')
+    expect(legalInput({ ...initial, legalName: 'Acme Inc.' }, initial, w, 'CA')).toEqual({ legalName: 'Acme Inc.', businessType: null })
+  })
+  it('a changed number rebuilds taxRegistrations from the SERVER list, swapping only the BN', () => {
+    const w = ws({ taxRegistrations: [GST_REG, BN] as never })
+    const initial = legalValues(w, 'CA')
+    const out = legalInput({ ...initial, businessNumber: '987654321' }, initial, w, 'CA')
+    expect(Object.keys(out).sort()).toEqual(['businessType', 'legalName', 'taxRegistrations'])
     expect(out.taxRegistrations).toEqual([
       { country: 'CA', type: 'GST_HST', number: '123456789RT0001', region: null, label: null, rate: null },
       { country: 'CA', type: 'BN', number: '987654321', region: null, label: null, rate: null },
@@ -112,10 +131,15 @@ describe('Profile', () => {
   })
   it('a US business number is the EIN', () => {
     const w = ws()
-    const initial = profileValues(w, 'US')
-    expect(profileInput({ ...initial, businessNumber: '12-3456789' }, initial, w, 'US').taxRegistrations).toEqual([
+    const initial = legalValues(w, 'US')
+    expect(legalInput({ ...initial, businessNumber: '12-3456789' }, initial, w, 'US').taxRegistrations).toEqual([
       { country: 'US', type: 'EIN', number: '12-3456789', region: null, label: null, rate: null },
     ])
+  })
+  it('a 422 on a registration lands on the number', () => {
+    expect(legalErrorField('taxRegistrations.1.number')).toBe('businessNumber')
+    expect(legalErrorField('businessType')).toBe('businessType')
+    expect(legalErrorField('name')).toBeNull()
   })
   it('a 422 is split into its field path', () => {
     expect(serverRefusal(new FonderieApiError('VALIDATION', 'legalName: too long', 422))).toEqual({ path: 'legalName', message: 'too long' })
@@ -204,6 +228,9 @@ describe('Taxes follow the head office', () => {
       { country: 'CA', type: 'QST', number: null, rate: 10, region: null, label: null },
     ])
   })
+  it('the Taxes page sends { taxRegistrations } only', () => {
+    expect(Object.keys(taxInput(rowsFor('QC', 'CA', [GST_REG]), ws()).input)).toEqual(['taxRegistrations'])
+  })
   it('a 422 lands on the row it came from', () => {
     const built = taxInput(rowsFor('QC', 'CA', [GST_REG]), ws({ taxRegistrations: [GST_REG, BN] as never }))
     expect(taxErrorField('taxRegistrations.0.number', built.sources)).toBe('derived-GST.number')
@@ -227,6 +254,7 @@ describe('Document numbers', () => {
       documentPrefixes: { receipt: 'R', invoice: 'ACME', estimate: 'ACME', job: 'ACME' },
     })
     expect(prefixValues({ documentPrefixes: { invoice: 'A', estimate: 'B', job: 'A' } } as never).customized).toBe(true)
+    expect(Object.keys(prefixInput(prefixValues(settings), settings))).toEqual(['documentPrefixes'])
   })
 })
 

@@ -1,5 +1,14 @@
 # Parity phase 3 — Business info
 
+> **Superseded layout (2026-10-08):** Business info is now a hub of grouped rows, one page per
+> row, exactly as the mobile app's `docs/ux/BUSINESS-SCREEN.md` (the spec, 1:1). Hub
+> `/organization/business` (groups from `src/constants/businessMenu.ts`, each card a title + a
+> one-line description); pages `/organization/business/{profile,legal,emails,phones,locations,taxes,numbers,regional}`,
+> the location form `/organization/business/locations/new` and `/organization/business/locations/:id`.
+> Each form page has Save changes / Discard changes and sends only its own fields (Business
+> profile: name, slogan, sector, website; Legal details: legal name, legal form, BN / EIN); lists
+> open their add form from "+". The field rules below still hold; where they say "card", read "page".
+
 Reference: the mobile app's `BusinessInfoScreen` (`.view.tsx`, `.controller.ts`, `BusinessCard.tsx`,
 `BusinessContacts.tsx`, `BusinessTaxes.tsx`, `BusinessSettings.tsx`), `AddressAutocomplete`,
 `PhoneInput.controller.ts`, `usePlaceSearch`, `utils/timeZones.ts`, `constants/trades.ts`.

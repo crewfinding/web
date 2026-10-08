@@ -1,132 +1,73 @@
-import type { IWorkspaceDTO, IWorkspaceLocationDTO } from '@fonderie/client'
-import { useWorkspaceId } from '@fonderie/react'
-import {
-  useCurrentWorkspace as useWorkspaceRead,
-  usePermissions,
-  useWorkspaceLocations,
-  useWorkspaceSettings,
-} from '@fonderie/react-workspaces'
-import { Button } from '../../components/Button'
-import { Notice } from '../../components/Notice'
+import { usePermissions } from '@fonderie/react-workspaces'
+import { Buildings, CaretRight, CreditCard, Envelope, Info, MapPin, Package, Phone, Translate } from '@phosphor-icons/react'
+import type { Icon } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
+import { Card } from '../../components/Card'
+import { BUSINESS_GROUPS, type BusinessIcon } from '../../constants/businessMenu'
 import { useTranslation } from '../../hooks/useTranslation'
-import { errorMessage } from '../../lib/apiErrors'
-import { homeCountry } from '../../lib/business'
-import { fonderie } from '../../lib/fonderie'
-import { ContactCard } from './business/ContactCard'
-import { LocationsCard } from './business/LocationsCard'
-import { ProfileCard } from './business/ProfileCard'
-import { NumbersCard, RegionalCard } from './business/SettingsCards'
-import { TaxesCard } from './business/TaxesCard'
+import { pageAccess } from '../../lib/businessPages'
+import { AccessBanner, PageHeading, WorkspaceStates } from './business/Shell'
+import { useSelectedWorkspace } from './business/useSelectedWorkspace'
 
-// Business info — the mobile app's BusinessInfoScreen (docs/parity/3-business.md):
-// six cards, each saving only its own fields.
+// Business info — the mobile app's BusinessInfoScreen (docs/ux/BUSINESS-SCREEN.md):
+// the account-settings pattern. A hub of groups, each a card with a title and
+// a one-line description, whose rows open one page each (one focused form or
+// one list, its own Save). No form and no value here; every row opens its
+// page for everyone — read-only people see the values there.
 
-/** A key that changes when the stored values a card edits change — the card then remounts on them. */
-const cardKey = (...parts: unknown[]) => JSON.stringify(parts)
-const isBn = (r: { type: string }) => r.type === 'BN' || r.type === 'EIN'
-
-function BusinessCards({ workspace, canEdit }: { workspace: IWorkspaceDTO; canEdit: boolean }) {
-  const locationsHook = useWorkspaceLocations()
-  const locations: IWorkspaceLocationDTO[] = locationsHook.locations ?? []
-  const settingsHook = useWorkspaceSettings()
-  const country = homeCountry(workspace, locations)
-  const head = locations.find((l) => l.isHeadOffice && !l.isArchived)
-  const regs = workspace.taxRegistrations ?? []
-  const settings = settingsHook.settings ?? null
-
-  return (
-    <div className="space-y-4">
-      <ProfileCard
-        key={cardKey('profile', workspace.id, country, workspace.name, workspace.motto, workspace.industry, workspace.legalName, workspace.businessType, regs.filter(isBn))}
-        workspace={workspace}
-        country={country}
-        canEdit={canEdit}
-      />
-      <ContactCard key={cardKey('contact', workspace.id, workspace.website)} workspace={workspace} canEdit={canEdit} country={country} />
-      <LocationsCard workspace={workspace} canEdit={canEdit} country={country} hook={locationsHook} />
-      <TaxesCard
-        key={cardKey('taxes', workspace.id, head?.address.country, head?.address.state, regs.filter((r) => !isBn(r)))}
-        workspace={workspace}
-        locations={locations}
-        canEdit={canEdit}
-      />
-      <NumbersCard
-        key={cardKey('numbers', workspace.id, settings?.documentPrefixes ?? null)}
-        settings={settings}
-        settingsLoading={settingsHook.isLoading}
-        settingsError={!!settingsHook.error}
-        canEdit={canEdit}
-      />
-      <RegionalCard
-        key={cardKey('regional', workspace.id, settings?.locale, settings?.timezone, settings?.currency, workspace.languages, head?.address.state)}
-        workspace={workspace}
-        settings={settings}
-        settingsLoading={settingsHook.isLoading}
-        settingsError={!!settingsHook.error}
-        locations={locations}
-        country={country}
-        canEdit={canEdit}
-      />
-    </div>
-  )
+const ICONS: Record<BusinessIcon, Icon> = {
+  domain: Buildings,
+  report: Info,
+  mail: Envelope,
+  call: Phone,
+  location: MapPin,
+  card: CreditCard,
+  inventory: Package,
+  translate: Translate,
 }
 
 export default function Business() {
   const { t } = useTranslation()
-  const { workspace, isLoading, error, refresh } = useWorkspaceRead()
-  const { isManager, isLoading: checkingAccess } = usePermissions()
-  const activeId = useWorkspaceId(fonderie)
-
-  // Right after a workspace switch the read may still hold the previous
-  // workspace — never show (or let anyone edit) it under the new one.
-  const current = workspace && (!activeId || workspace.id === activeId) ? workspace : null
-  const retry = () => void refresh({ force: true }).catch(() => undefined)
-
-  let body
-  if (current) {
-    // While the permissions load, everyone sees the read-only cards. An
-    // archived workspace is read-only for everyone (409 WORKSPACE_ARCHIVED).
-    const archived = !!current.isArchived
-    const canEdit = isManager && !checkingAccess && !archived
-    body = (
-      <div className="space-y-4" data-testid={canEdit ? 'business-form' : 'business-details'}>
-        {archived ? (
-          <Notice tone="warning">{t('business.archived')}</Notice>
-        ) : !canEdit && !checkingAccess ? (
-          <Notice>{t('business.readonly')}</Notice>
-        ) : null}
-        <BusinessCards key={current.id} workspace={current} canEdit={canEdit} />
-      </div>
-    )
-  } else if (error) {
-    body = (
-      <div className="space-y-3" data-testid="business-error">
-        <Notice tone="error">{`${t('business.errorLoad')} ${errorMessage(t, error)}`}</Notice>
-        <Button onClick={retry}>{t('business.retry')}</Button>
-      </div>
-    )
-  } else if (isLoading || workspace) {
-    body = (
-      <p role="status" className="py-6 text-center text-sm text-ink-subtle" data-testid="business-loading">
-        {t('business.loading')}
-      </p>
-    )
-  } else {
-    body = (
-      <div className="space-y-3" data-testid="business-not-found">
-        <p className="text-sm text-ink">{t('business.notFound')}</p>
-        <Button onClick={retry}>{t('business.retry')}</Button>
-      </div>
-    )
-  }
+  const { current, pending, error, retry } = useSelectedWorkspace()
+  const { isManager, isLoading: permsLoading } = usePermissions()
+  const access = current ? pageAccess({ isManager, permsLoading, isArchived: !!current.isArchived }) : null
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-card-title text-ink">{t('business.title')}</h2>
-        <p className="mt-1 text-sm text-ink-subtle">{t('business.intro')}</p>
-      </div>
-      {body}
+    <div className="space-y-4" data-testid="business-hub">
+      <PageHeading title={t('business.title')} paragraph={t('business.intro')} focus={false} />
+      {current && access ? (
+        <>
+          <AccessBanner banner={access.banner} />
+          {BUSINESS_GROUPS.map((g) => (
+            <Card as="section" key={g.id} className="p-5" aria-labelledby={`business-group-${g.id}`} data-testid={`business-group-${g.id}`}>
+              <h3 id={`business-group-${g.id}`} className="text-base font-semibold text-ink">
+                {t(g.title)}
+              </h3>
+              <p className="mt-1 text-sm text-ink-subtle">{t(g.description)}</p>
+              <ul className="mt-3 divide-y divide-hairline">
+                {g.options.map((o) => {
+                  const Glyph = ICONS[o.icon]
+                  return (
+                    <li key={o.key}>
+                      <Link
+                        to={o.path}
+                        className="-mx-2 flex min-h-11 items-center gap-3 rounded-md px-2 py-2 text-sm text-ink transition-colors hover:bg-surface-2"
+                        data-testid={`business-row-${o.key}`}
+                      >
+                        <Glyph className="h-5 w-5 shrink-0 text-ink-subtle" aria-hidden="true" />
+                        <span className="flex-1">{t(o.label)}</span>
+                        <CaretRight className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </Card>
+          ))}
+        </>
+      ) : (
+        <WorkspaceStates error={error} pending={pending} retry={retry} />
+      )}
     </div>
   )
 }

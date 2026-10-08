@@ -16,6 +16,49 @@ const business: typeof enBusiness = {
   cancel: 'Cancelar',
   more: 'Más acciones',
   empty: 'No puede estar vacío',
+  // The hub (docs/ux/BUSINESS-SCREEN.md): groups, rows, each page's paragraph.
+  group: {
+    business: {
+      title: 'Empresa',
+      description: 'Cómo aparece tu empresa en cotizaciones, facturas y mensajes.',
+    },
+    contact: {
+      title: 'Contacto',
+      description: 'Cómo te contactan tus clientes y tu equipo.',
+    },
+    documents: {
+      title: 'Impuestos y documentos',
+      description: 'Los impuestos que cobras y cómo se numeran tus documentos.',
+    },
+    preferences: {
+      title: 'Preferencias',
+      description: 'Idioma, zona horaria y moneda de tus documentos.',
+    },
+  },
+  option: {
+    profile: 'Perfil de la empresa',
+    legal: 'Datos legales',
+    emails: 'Correos electrónicos',
+    phones: 'Números de teléfono',
+    locations: 'Ubicaciones',
+    taxes: 'Impuestos',
+    numbers: 'Numeración de documentos',
+    regional: 'Configuración regional',
+  },
+  paragraph: {
+    profile: 'Tu logotipo, nombre, eslogan, sector y sitio web, tal como los ven tus clientes.',
+    legal: 'La razón social, la forma jurídica y el número de empresa en tus facturas.',
+    emails: 'El correo principal aparece en tus documentos. Agrega otros para facturación o despacho.',
+    phones: 'El número principal aparece en tus documentos. Agrega otros para la oficina o el despacho.',
+    locations: 'Tu oficina principal define tus impuestos y tu zona horaria. Agrega tus otras oficinas y talleres.',
+    taxes: 'Los impuestos de tus cotizaciones y facturas, con tus números de registro.',
+    numbers: 'Cómo se numeran tus facturas, cotizaciones y trabajos.',
+    regional: 'El idioma, la zona horaria y la moneda de tus documentos.',
+  },
+  footer: {
+    save: 'Guardar cambios',
+    discard: 'Descartar cambios',
+  },
   logo: {
     a11y: 'Logotipo de la empresa',
     add: 'Agregar un logotipo',
@@ -23,14 +66,11 @@ const business: typeof enBusiness = {
     uploading: 'Subiendo el logotipo…',
     prepareError: 'No se pudo preparar esta imagen. Prueba con otra.',
     delete: 'Eliminar',
-    deleteA11y: 'Eliminar el logotipo',
   },
   profile: {
-    title: 'Perfil',
     name: 'Nombre de la empresa',
     slogan: 'Eslogan',
     sector: 'Sector',
-    legal: 'Datos legales',
     legalName: 'Razón social (si es distinta)',
     type: 'Forma jurídica',
   },
@@ -64,7 +104,7 @@ const business: typeof enBusiness = {
     other: 'Otro',
   },
   contact: {
-    title: 'Contacto',
+    primaryBadge: 'Principal',
     emails: 'Correos electrónicos',
     phones: 'Números de teléfono',
     emailEmpty: 'Aún no hay correos.',
@@ -76,9 +116,7 @@ const business: typeof enBusiness = {
     labelPlaceholder: 'p. ej. Facturación, Despacho',
     editLabel: 'Editar etiqueta',
     remove: 'Quitar',
-    emailAddLabel: 'Otro correo',
     emailAdd: 'Agregar correo',
-    phoneAddLabel: 'Otro número',
     phoneAdd: 'Agregar número',
     emailError: 'Ingresa un correo electrónico válido',
     phoneError: 'Ingresa un número de teléfono válido',
@@ -112,6 +150,8 @@ const business: typeof enBusiness = {
     keep: 'Mantener la dirección actual',
     imprecise: 'Elige un resultado más preciso: una dirección con calle y número, no una ciudad ni una región.',
     pick: 'Busca la dirección y elígela entre las sugerencias.',
+    editTitle: 'Editar ubicación',
+    notFound: 'No se encontró esta ubicación. Es posible que se haya eliminado.',
     maps: 'Abrir en Mapas',
   },
   reason: {
@@ -123,13 +163,12 @@ const business: typeof enBusiness = {
     LIMIT_REACHED: 'Alcanzaste el límite de esta lista: quita uno para agregar otro.',
   },
   taxes: {
-    title: 'Impuestos',
-    titleRegion: 'Impuestos — {region}',
     needHeadOffice: 'Agrega primero tu sede principal: los impuestos dependen de su provincia o estado.',
     stored: 'Números fiscales',
     error: 'No se pudieron cargar las tasas de impuestos.',
     rateHelp: 'Tasa: {rate}',
-    custom: 'Otras tasas / agregar un impuesto',
+    basedOn: 'Según tu oficina principal en {region}.',
+    customize: 'Personalizar tasas',
     add: 'Agregar un número fiscal',
     remove: 'Quitar este número fiscal',
     country: 'País',
@@ -149,7 +188,6 @@ const business: typeof enBusiness = {
     },
   },
   numbers: {
-    title: 'Numeración de documentos',
     prefix: 'Prefijo',
     placeholder: 'p. ej. {example}',
     error: 'Hasta 10 letras, números o guiones',
@@ -161,7 +199,6 @@ const business: typeof enBusiness = {
   },
   settingsUnavailable: 'No se pudieron cargar estos ajustes; se mantienen como están.',
   regional: {
-    title: 'Configuración regional',
     locale: 'Idioma de los documentos',
     timezone: 'Zona horaria',
     timezoneSuggested: 'Según tu sede principal: {zone}',
@@ -175,8 +212,8 @@ const business: typeof enBusiness = {
   },
   address: {
     placeholder: 'Busca una dirección concreta en el mapa…',
-    detailsError: 'No se pudo cargar esta dirección. Elígela de nuevo.',
-    searchError: 'La búsqueda de direcciones no está disponible ahora; escribe la dirección.',
+    detailsError: 'No pudimos cargar esta dirección. Vuelve a elegirla en las sugerencias.',
+    searchError: 'No pudimos cargar las sugerencias de direcciones. Revisa tu conexión e inténtalo de nuevo.',
   },
   phone: {
     placeholder: 'Ingresa un número de teléfono',
