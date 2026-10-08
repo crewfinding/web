@@ -128,11 +128,13 @@ export const OPEN_KEYS: Record<ActivityTargetKind, TranslationKey> = {
 }
 
 /**
- * The web page each kind opens. The web app has no job, quote, invoice, bill
- * of lading or customer page yet, so none links: a kind gains its route here
- * when its page ships (e.g. customer: (p) => `/customers/${p.customerId}`).
+ * The web page each kind opens. The web app has no job, quote, invoice or bill
+ * of lading page yet, so those do not link: a kind gains its route here when
+ * its page ships.
  */
-export const ACTIVITY_ROUTES: Partial<Record<ActivityTargetKind, (params: Record<string, string>) => string>> = {}
+export const ACTIVITY_ROUTES: Partial<Record<ActivityTargetKind, (params: Record<string, string>) => string>> = {
+  customer: (p) => `/customers/${encodeURIComponent(p.customerId ?? '')}`,
+}
 
 export interface IActivityLine {
   /** The sentence, in the reader's language. */

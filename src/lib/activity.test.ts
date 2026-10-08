@@ -68,10 +68,12 @@ describe('where a row leads', () => {
     expect(activityTarget(ev('fonderie.customer.updated', { customerId: 'c1' }))).toEqual({ kind: 'customer', params: { customerId: 'c1' } })
     expect(activityTarget(ev('fonderie.workspace.updated'))).toBeNull()
   })
-  it('a link only where the web has the page', () => {
+  it('a link only where the web has the page: a customer opens its page; a job, quote, invoice or bill does not link yet', () => {
     const target = activityTarget(ev('fonderie.customer.updated', { customerId: 'c 1' }))
-    expect(activityHref(target)).toBeNull()
-    expect(activityHref(target, { customer: (p) => `/customers/${encodeURIComponent(p.customerId!)}` })).toBe('/customers/c%201')
+    expect(activityHref(target)).toBe('/customers/c%201')
+    expect(activityHref(activityTarget(ev('crewfinding.job.updated', { jobId: 'j1' })))).toBeNull()
+    expect(activityHref(activityTarget(ev('crewfinding.invoice.sent', { invoiceId: 'i1' })))).toBeNull()
+    expect(activityHref(target, {})).toBeNull()
     expect(activityHref(null, { customer: () => '/x' })).toBeNull()
   })
 })
