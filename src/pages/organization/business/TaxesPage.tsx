@@ -17,9 +17,12 @@ import {
   taxErrorField,
   taxHome,
   taxInput,
+  taxRegions,
   taxValues,
+  usualRate,
   type ITaxRow,
 } from '../../../lib/business'
+import { CA_PROVINCES, US_STATES } from '../../../constants/regions'
 import { places, type ITaxPresets } from '../../../lib/places'
 import type { TranslationKey } from '../../../locales'
 import { businessOption } from '../../../constants/businessMenu'
@@ -45,6 +48,10 @@ const rowName = (t: T, row: ITaxRow) =>
   (row.derived && NAME_KEYS[row.code] ? t(`business.taxes.names.${NAME_KEYS[row.code]}` as TranslationKey) : typeName(t, row.type))
 
 const percent = (rate: string) => (rate.trim() ? `${rate.trim()} %` : '')
+
+/** A province in the user's language; a state by its name. */
+const regionName = (t: T, country: string, code: string) =>
+  country === 'CA' && code in CA_PROVINCES ? t(`business.provinces.${code as keyof typeof CA_PROVINCES & string}` as TranslationKey) : (US_STATES[code] ?? code)
 
 /** The API's tax tables with their loading / error state. */
 function useTaxPresetTables() {
@@ -117,6 +124,7 @@ function Taxes({ workspace, locations, canEdit, write, back }: IBusinessContext)
         workspace={workspace}
         initial={taxValues(workspace, home, regionTaxes(presets.data, home)).rows}
         country={home.country}
+        presets={presets.data}
         canEdit={canEdit}
         write={write}
         back={back}
@@ -146,6 +154,7 @@ function TaxRows({
   workspace,
   initial,
   country,
+  presets,
   canEdit,
   write,
   back,
@@ -153,6 +162,7 @@ function TaxRows({
   workspace: IWorkspaceDTO
   initial: ITaxRow[]
   country: 'CA' | 'US'
+  presets: Parameters<typeof usualRate>[0]
   canEdit: boolean
   write: IBusinessContext['write']
   back: () => void
@@ -176,6 +186,9 @@ function TaxRows({
     for (const r of rows) {
       if (!isValidRate(r.rate)) e[`${r.key}.rate`] = t('business.taxes.rateError')
       if (r.number.trim().length > MAX.taxNumber) e[`${r.key}.number`] = t('business.tooLong', { max: MAX.taxNumber })
+      if (!r.derived && !r.region && taxRegions(r.country, r.type).length > 0) {
+        e[`${r.key}.region`] = t(r.country === 'US' ? 'business.taxes.stateError' : 'business.taxes.provinceError')
+      }
     }
     if (Object.keys(e).some((k) => k.endsWith('.rate') || !k.startsWith('derived'))) setOpen(true)
     return e
@@ -258,7 +271,7 @@ function TaxRows({
                 value={r.country}
                 allowNone={false}
                 options={(['CA', 'US'] as const).map((c) => ({ label: t(`business.countries.${c}`), value: c }))}
-                onChange={(c) => patch(r.key, { country: c, type: TAX_TYPES[c as 'CA' | 'US']?.[0] ?? r.type })}
+                onChange={(c) => patch(r.key, { country: c, type: TAX_TYPES[c as 'CA' | 'US']?.[0] ?? r.type, region: '' })}
                 error={d.errors[`${r.key}.country`]}
               />
               <LabeledSelect
@@ -269,15 +282,21 @@ function TaxRows({
                   label: typeName(t, k),
                   value: k,
                 }))}
-                onChange={(k) => patch(r.key, { type: k })}
+                onChange={(k) => patch(r.key, { type: k, region: taxRegions(r.country, k).includes(r.region) ? r.region : '' })}
                 error={d.errors[`${r.key}.type`]}
               />
-              <Input
-                label={optional(t('business.taxes.region'))}
-                value={r.region}
-                error={d.errors[`${r.key}.region`]}
-                onChange={(e) => patch(r.key, { region: e.target.value.toUpperCase() })}
-              />
+              {/* Only a tax that belongs to a province / state asks for one (GST/HST is federal, QST is Québec's). */}
+              {taxRegions(r.country, r.type).length > 0 ? (
+                <LabeledSelect
+                  label={t(r.country === 'US' ? 'business.taxes.state' : 'business.taxes.province')}
+                  value={r.region}
+                  options={taxRegions(r.country, r.type)
+                    .map((c) => ({ label: regionName(t, r.country, c), value: c }))
+                    .sort((a, b) => a.label.localeCompare(b.label))}
+                  onChange={(c) => patch(r.key, { region: c, ...(r.rate.trim() ? {} : { rate: usualRate(presets, r.country, r.type, c) ?? '' }) })}
+                  error={d.errors[`${r.key}.region`]}
+                />
+              ) : null}
               <Input
                 label={optional(t('business.taxes.number'))}
                 value={r.number}

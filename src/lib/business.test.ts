@@ -23,6 +23,8 @@ import {
   ratesCustomized,
   reasonKey,
   regionTaxes,
+  taxRegions,
+  usualRate,
   regionalInput,
   regionalValues,
   serverRefusal,
@@ -285,5 +287,26 @@ describe('Regional settings', () => {
     expect(regionTimeZone('CA', 'BC')).toBe('America/Vancouver')
     expect(regionTimeZone('CA', 'CA-QC')).toBe('America/Toronto')
     expect(regionTimeZone('FR', 'X')).toBeNull()
+  })
+})
+
+describe('Taxes: a province / state only where the tax has one', () => {
+  const WITH_STATES = { ...PRESETS, presets: { ...PRESETS.presets, US_STATES: { TX: [{ code: 'SALES_TAX', label: 'Sales tax', rate: 0.0625 }], OR: [] } } }
+
+  it('the server’s rules: PST in BC / MB / SK, a state permit in any state; GST/HST and QST none', () => {
+    expect(taxRegions('CA', 'PST')).toEqual(['BC', 'MB', 'SK'])
+    expect(taxRegions('CA', 'GST_HST')).toEqual([])
+    expect(taxRegions('CA', 'QST')).toEqual([])
+    expect(taxRegions('US', 'STATE_SALES_TAX')).toHaveLength(56)
+    expect(usualRate(PRESETS as never, 'CA', 'PST', 'MB')).toBe('7')
+    expect(usualRate(WITH_STATES as never, 'US', 'STATE_SALES_TAX', 'TX')).toBe('6.25')
+    expect(usualRate(PRESETS as never, 'US', 'STATE_SALES_TAX', 'TX')).toBeNull()
+  })
+
+  it('a US head office starts at its state’s base rate (none in a state without one); an older API leaves it to the owner', () => {
+    const rows = (presets: unknown, state: string) => regionTaxes(presets as never, { country: 'US', province: state })
+    expect(rows(WITH_STATES, 'TX')).toEqual([{ code: 'SALES_TAX', label: 'Sales tax', rate: '6.25' }])
+    expect(rows(WITH_STATES, 'OR')).toEqual([])
+    expect(rows(PRESETS, 'TX')).toEqual([{ code: 'SALES_TAX', label: 'Sales tax', rate: null }])
   })
 })

@@ -12,6 +12,7 @@ import type {
 
 import type { IAddressParts, ITaxPresets } from './placeParts'
 import { asCountry, isValidPhone, normalizePhone } from './phone'
+import { US_STATES } from '../constants/regions'
 import type { TranslationKey } from '../locales'
 
 // The business profile IS the Fonderie workspace. Business info is a hub
@@ -325,7 +326,12 @@ export interface ITaxRow {
 
 /** The taxes the head office's region charges, from the API's preset tables: rates as percent text. */
 export const regionTaxes = (presets: Pick<ITaxPresets, 'presets'>, home: { country: 'CA' | 'US'; province: string }): { code: string; label: string; rate: string | null }[] => {
-  if (home.country === 'US') return presets.presets.US.map((p) => ({ code: p.code, label: p.label, rate: null }))
+  if (home.country === 'US') {
+    // The state's base rate; an API that predates US_STATES sends none — the business enters it.
+    const state = presets.presets.US_STATES?.[home.province]
+    if (state) return state.map((p) => ({ code: p.code, label: p.label, rate: percentText(p.rate) }))
+    return presets.presets.US.map((p) => ({ code: p.code, label: p.label, rate: null }))
+  }
   return (presets.presets.CA[home.province] ?? []).map((p) => ({ code: p.code, label: p.label, rate: percentText(p.rate) }))
 }
 
@@ -441,6 +447,26 @@ export const newTaxRow = (country: 'CA' | 'US', n: number): ITaxRow => ({
   rate: '',
   presetRate: null,
 })
+
+/**
+ * The provinces / states a registration of this kind belongs to — the
+ * server's rules (@fonderie/core/region). Empty when it has none to pick:
+ * GST/HST is federal and QST is Québec's, so a province typed for them was
+ * dropped on save.
+ */
+export const taxRegions = (country: string, type: string): readonly string[] => {
+  if (country === 'CA' && type === 'PST') return ['BC', 'MB', 'SK']
+  if (country === 'US' && type === 'STATE_SALES_TAX') return Object.keys(US_STATES)
+  return []
+}
+
+/** The usual rate (percent text) of a registration of this kind in this province / state, or null. */
+export const usualRate = (presets: Pick<ITaxPresets, 'presets'> | null | undefined, country: string, type: string, region: string): string | null => {
+  if (!presets || !region) return null
+  const lines = country === 'CA' ? presets.presets.CA[region] : country === 'US' ? presets.presets.US_STATES?.[region] : undefined
+  const line = lines?.find((l) => (REGISTRATION_OF[l.code] ?? l.code) === type)
+  return line ? percentText(line.rate) : null
+}
 
 /** The kinds of registration an extra row can be, per country (BN / EIN are the Profile card's). */
 export const TAX_TYPES: Record<'CA' | 'US', readonly string[]> = {

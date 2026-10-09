@@ -35,7 +35,12 @@ export interface ITaxPresets {
   region: string | null
   currency: string
   default: Array<{ code: string; label: string; rate: number }>
-  presets: { CA: Record<string, Array<{ code: string; label: string; rate: number }>>; US: Array<{ code: string; label: string; rate: null }> }
+  presets: {
+    CA: Record<string, Array<{ code: string; label: string; rate: number }>>
+    US: Array<{ code: string; label: string; rate: null }>
+    /** Each state's base sales tax (none where there is no state sales tax). Absent from an older API. */
+    US_STATES?: Record<string, Array<{ code: string; label: string; rate: number }>>
+  }
 }
 
 /** "H2X1Y4" → "H2X 1Y4" (the proxy strips spaces; a Canadian code reads with one). */
